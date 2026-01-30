@@ -1,0 +1,42 @@
+{
+  "root": {
+    "username": "root",
+    "password_hash": "e14cb9e5c0eeee0ea313a4e04fbd10aa17ac17aa33a3cad4bdfe74b87ca18ef8",
+    "uid": 0,
+    "home_dir": "/home/root",
+    "is_admin": true,
+    "created_at": "2026-01-30T10:52:16.251086",
+    "last_login": null,
+    "login_count": 0
+  },
+  "admin": {
+    "username": "admin",
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "uid": 1001,
+    "home_dir": "/home/admin",
+    "is_admin": true,
+    "created_at": "2026-01-30T10:52:16.251093",
+    "last_login": "2026-01-30T11:29:05.730958",
+    "login_count": 2
+  },
+  "guest": {
+    "username": "guest",
+    "password_hash": "84983c60f7daadc1cb8698621f802c0d9f9a3c3c295c810748fb048115c186ec",
+    "uid": 1002,
+    "home_dir": "/home/guest",
+    "is_admin": false,
+    "created_at": "2026-01-30T10:52:16.251097",
+    "last_login": null,
+    "login_count": 0
+  },
+  "doubo": {
+    "username": "doubo",
+    "password_hash": "a285e19fc91d6614e7f7233287c3c3a87c1da27e2702d0bb9d5e619520969aff",
+    "uid": 1003,
+    "home_dir": "/home/doubo",
+    "is_admin": true,
+    "created_at": "2026-01-30T10:53:35.836732",
+    "last_login": "2026-01-30T15:52:41.736672",
+    "login_count": 19
+  }
+}

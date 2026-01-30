@@ -1,0 +1,220 @@
+[gd_scene load_steps=12 format=3 uid="uid://b5runrwq4lnet"]
+
+[ext_resource type="Script" path="res://day_and_night.gd" id="1_ia3a5"]
+[ext_resource type="Animation" uid="uid://l33ie7wvp8m5" path="res://scripts/day_and_night.tres" id="2_uevmv"]
+[ext_resource type="Animation" uid="uid://bq1yu0k7r0va3" path="res://scripts/anim.res" id="3_pna0n"]
+[ext_resource type="Texture2D" uid="uid://ctatjjkunm0h1" path="res://assets/game_ui_panel.png" id="4_66srs"]
+[ext_resource type="FontFile" uid="uid://uynswcck0os1" path="res://fonts/pixelated.ttf" id="5_2ooa7"]
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2frij"]
+_data = {
+"day_night_cycle": ExtResource("2_uevmv")
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_whls8"]
+_data = {
+"day_and_night": ExtResource("2_uevmv"),
+"day_night_cycle_reverse": ExtResource("3_pna0n")
+}
+
+[sub_resource type="Animation" id="Animation_qd2br"]
+resource_name = "night_cycle"
+length = 480.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-1.6, 480),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0.639216), Color(0, 0, 0, 0.639216)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_lkj74"]
+_data = {
+"night_cycle": SubResource("Animation_qd2br")
+}
+
+[sub_resource type="Animation" id="Animation_s3wn8"]
+resource_name = "day_cycle"
+length = 480.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-0.9, 480),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0, 0, 0, 0), Color(0, 0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_3aro7"]
+_data = {
+"day_cycle": SubResource("Animation_s3wn8")
+}
+
+[node name="day-and-night" type="Control"]
+self_modulate = Color(0.00382302, 0.00382302, 0.00382302, 0.466062)
+top_level = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_ia3a5")
+
+[node name="sunset_rect" type="ColorRect" parent="."]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = -419.0
+offset_top = -302.0
+offset_right = 573.0
+offset_bottom = 389.0
+color = Color(0, 0, 0, 1)
+
+[node name="sunset_cycle" type="AnimationPlayer" parent="sunset_rect"]
+libraries = {
+"": SubResource("AnimationLibrary_2frij")
+}
+
+[node name="sunrise_rect" type="ColorRect" parent="."]
+visible = false
+self_modulate = Color(0, 0, 0, 0.639216)
+layout_mode = 0
+offset_left = -419.0
+offset_top = -302.0
+offset_right = 573.0
+offset_bottom = 389.0
+color = Color(0, 0, 0, 1)
+
+[node name="sunrise_cycle" type="AnimationPlayer" parent="sunrise_rect"]
+libraries = {
+"": SubResource("AnimationLibrary_whls8")
+}
+
+[node name="night_rect" type="ColorRect" parent="."]
+visible = false
+self_modulate = Color(0, 0, 0, 0.639216)
+layout_mode = 0
+offset_left = -419.0
+offset_top = -302.0
+offset_right = 573.0
+offset_bottom = 389.0
+color = Color(0, 0, 0, 1)
+
+[node name="night_cycle" type="AnimationPlayer" parent="night_rect"]
+libraries = {
+"": SubResource("AnimationLibrary_lkj74")
+}
+
+[node name="day_rect" type="ColorRect" parent="."]
+visible = false
+self_modulate = Color(0, 0, 0, 0)
+layout_mode = 0
+offset_left = -419.0
+offset_top = -302.0
+offset_right = 573.0
+offset_bottom = 389.0
+color = Color(0, 0, 0, 1)
+
+[node name="day_cycle" type="AnimationPlayer" parent="day_rect"]
+libraries = {
+"": SubResource("AnimationLibrary_3aro7")
+}
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="CanvasLayer"]
+self_modulate = Color(1, 1, 1, 0)
+offset_left = 82.0
+offset_top = -22.0
+offset_right = 122.0
+offset_bottom = 18.0
+scale = Vector2(4.5, 4.5)
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/Panel"]
+position = Vector2(19, 19)
+texture = ExtResource("4_66srs")
+region_enabled = true
+region_rect = Rect2(0, 0, 72, 23)
+
+[node name="count" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = 3.44444
+offset_top = -6.11111
+offset_right = 42.4444
+offset_bottom = 19.8889
+scale = Vector2(0.2, 0.2)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "0"
+
+[node name="day" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = -11.2
+offset_top = -6.39999
+offset_right = 62.8
+offset_bottom = 19.6
+scale = Vector2(0.15, 0.15)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "Day"
+
+[node name="month" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = 10.7778
+offset_top = -6.33333
+offset_right = 49.7778
+offset_bottom = 19.6667
+scale = Vector2(0.15, 0.15)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "JAN"
+
+[node name="clock_time" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = -9.22223
+offset_top = 2.33333
+offset_right = 64.7778
+offset_bottom = 28.3333
+scale = Vector2(0.25, 0.25)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "00:00"
+
+[node name="temperature" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = 9.22223
+offset_top = 1.88889
+offset_right = 83.2222
+offset_bottom = 27.8889
+scale = Vector2(0.2, 0.2)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "17°C"
+
+[node name="year" type="Label" parent="CanvasLayer/Panel/Sprite2D"]
+offset_left = 22.0
+offset_top = 1.0
+offset_right = 62.0
+offset_bottom = 36.0
+scale = Vector2(0.15, 0.15)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("5_2ooa7")
+text = "Year 1"
+
+[node name="clock" type="Timer" parent="."]
+autostart = true
+
+[connection signal="animation_finished" from="sunset_rect/sunset_cycle" to="." method="_on_sunset_cycle_animation_finished"]
+[connection signal="animation_finished" from="sunrise_rect/sunrise_cycle" to="." method="_on_sunrise_cycle_animation_finished"]
+[connection signal="animation_finished" from="night_rect/night_cycle" to="." method="_on_night_cycle_animation_finished"]
+[connection signal="animation_finished" from="day_rect/day_cycle" to="." method="_on_day_cycle_animation_finished"]
+[connection signal="timeout" from="clock" to="." method="_on_clock_timeout"]

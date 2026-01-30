@@ -1,0 +1,650 @@
+[gd_scene load_steps=23 format=3 uid="uid://kr2728h8fhgx"]
+
+[ext_resource type="Script" path="res://phillip_merchant.gd" id="1_gcd5s"]
+[ext_resource type="Texture2D" uid="uid://05c3q13iufuy" path="res://dialouge/pixil-frame-0 - 2024-02-25T150615.373.png" id="2_2fgai"]
+[ext_resource type="Texture2D" uid="uid://dl5g4spbmtq3u" path="res://assets/iron_pickaxe.png" id="3_k5iwa"]
+[ext_resource type="Texture2D" uid="uid://c4ipwv3k8c6e2" path="res://assets/pixil-frame-0 - 2024-10-09T192452.095.png" id="4_miuy8"]
+[ext_resource type="Texture2D" uid="uid://dq5bghvitjfnq" path="res://assets/seed_packet_neutral.png" id="5_shxnv"]
+[ext_resource type="Script" path="res://economy_manager.gd" id="6_j38rk"]
+[ext_resource type="FontFile" uid="uid://uynswcck0os1" path="res://fonts/pixelated.ttf" id="7_wuap1"]
+[ext_resource type="Texture2D" uid="uid://ckgep75t6jyli" path="res://assets/good_economy.png" id="8_p01hw"]
+[ext_resource type="Shader" path="res://assets/shadow.gdshader" id="9_tvlrt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wn3uw"]
+bg_color = Color(0.290196, 0.666667, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.196078, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 5
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pfq0e"]
+bg_color = Color(0.172549, 0.380392, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+anti_aliasing = false
+anti_aliasing_size = 0.01
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0nd11"]
+bg_color = Color(0.396078, 0, 0.6, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ysow1"]
+bg_color = Color(0.835294, 0.490196, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k38dm"]
+bg_color = Color(0.223529, 0.74902, 0.498039, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+anti_aliasing = false
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_mcwqv"]
+texture = ExtResource("3_k5iwa")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_no3no"]
+texture = ExtResource("4_miuy8")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rs4l1"]
+texture = ExtResource("5_shxnv")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_beelm"]
+bg_color = Color(0.172549, 0.380392, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+anti_aliasing = false
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_i041x"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_bsauq"]
+line_spacing = 0.0
+shadow_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7jk30"]
+bg_color = Color(0.839216, 0.513726, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.117647, 0.00392157, 0.207843, 1)
+corner_radius_top_left = 4
+corner_radius_bottom_right = 4
+anti_aliasing = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gqdbh"]
+shader = ExtResource("9_tvlrt")
+shader_parameter/amount = 10
+shader_parameter/borderScale = 2.0
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/color = null
+shader_parameter/modulate = Color(1, 1, 1, 1)
+shader_parameter/debug = false
+
+[node name="phillip_merchant" type="Node2D"]
+script = ExtResource("1_gcd5s")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_2fgai")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+scale = Vector2(2.5, 2.5)
+transform = Transform2D(2.5, 0, 0, 2.5, 0, 0)
+
+[node name="shop_ui" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 54.0
+offset_top = 26.8
+offset_right = 94.0
+offset_bottom = 66.8
+
+[node name="background" type="Panel" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_right = 340.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_wn3uw")
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 532.75
+offset_right = 572.75
+offset_bottom = 101.0
+
+[node name="redbane_purchase_button" type="Button" parent="CanvasLayer/shop_ui/GridContainer"]
+layout_mode = 2
+text = "+"
+
+[node name="chive_purchase_button" type="Button" parent="CanvasLayer/shop_ui/GridContainer"]
+layout_mode = 2
+text = "+"
+
+[node name="pinecone_purchase_button" type="Button" parent="CanvasLayer/shop_ui/GridContainer"]
+layout_mode = 2
+text = "+"
+
+[node name="GridContainer2" type="GridContainer" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 419.75
+offset_top = 8.0
+offset_right = 558.75
+offset_bottom = 109.0
+scale = Vector2(0.89, 0.89)
+
+[node name="Label2" type="Label" parent="CanvasLayer/shop_ui/GridContainer2"]
+layout_mode = 2
+text = "/10 Redbaneberry"
+
+[node name="Label3" type="Label" parent="CanvasLayer/shop_ui/GridContainer2"]
+layout_mode = 2
+text = "/10 Chives"
+
+[node name="Label4" type="Label" parent="CanvasLayer/shop_ui/GridContainer2"]
+layout_mode = 2
+text = "/15 Pinecones"
+
+[node name="GridContainer3" type="GridContainer" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 557.75
+offset_top = 4.0
+offset_right = 690.75
+offset_bottom = 105.0
+
+[node name="Label2" type="Label" parent="CanvasLayer/shop_ui/GridContainer3"]
+layout_mode = 2
+text = "1 Dollar"
+
+[node name="Label3" type="Label" parent="CanvasLayer/shop_ui/GridContainer3"]
+layout_mode = 2
+text = "1 Dollar"
+
+[node name="Label4" type="Label" parent="CanvasLayer/shop_ui/GridContainer3"]
+layout_mode = 2
+text = "1 Dollar"
+
+[node name="redbane_count" type="Label" parent="CanvasLayer/shop_ui"]
+layout_mode = 2
+offset_left = 407.75
+offset_top = 8.0
+offset_right = 540.75
+offset_bottom = 34.0
+scale = Vector2(0.9, 0.9)
+text = "0"
+
+[node name="chive_count" type="Label" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 407.75
+offset_top = 35.0
+offset_right = 540.75
+offset_bottom = 61.0
+scale = Vector2(0.9, 0.9)
+text = "0"
+
+[node name="pinecone_count" type="Label" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 407.75
+offset_top = 61.0
+offset_right = 540.75
+offset_bottom = 87.0
+scale = Vector2(0.9, 0.9)
+text = "0"
+
+[node name="Container" type="Container" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="category_frame" type="Panel" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = 135.0
+offset_bottom = 50.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfq0e")
+
+[node name="tool_frame" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 3.5
+offset_top = 2.0
+offset_right = 43.5
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_0nd11")
+
+[node name="material_frame" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 45.75
+offset_top = 2.0
+offset_right = 85.75
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ysow1")
+
+[node name="seed_frame" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 128.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_k38dm")
+
+[node name="tool_button" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 3.5
+offset_top = 2.0
+offset_right = 43.5
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_mcwqv")
+
+[node name="material_button" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 45.75
+offset_top = 2.0
+offset_right = 85.75
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_no3no")
+
+[node name="seed_button" type="Panel" parent="CanvasLayer/shop_ui/category_frame"]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 2.0
+offset_right = 128.0
+offset_bottom = 42.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_rs4l1")
+
+[node name="product_frame" type="Panel" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 142.0
+offset_top = 4.0
+offset_right = 330.0
+offset_bottom = 167.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_beelm")
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/shop_ui/product_frame"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 0
+offset_left = 6.25
+offset_top = 8.5
+offset_right = 193.25
+offset_bottom = 171.5
+columns = 5
+
+[node name="shop_slot1" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_1_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot1"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot1"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot2" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_2_button2" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot2"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot2"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot3" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_3_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot3"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot3"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot4" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_4_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot4"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot4"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot5" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_5_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot5"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot5"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot6" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_6_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot6"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot6"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot7" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_7_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot7"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot7"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot8" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_8_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot8"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot8"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot9" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_9_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot9"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot9"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot10" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_10_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot10"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot10"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot11" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_11_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot11"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot11"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot12" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_12_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot12"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot12"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot13" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_13_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot13"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot13"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot14" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_14_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot14"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot14"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot15" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_15_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot15"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot15"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot16" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_16_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot16"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot16"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot17" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_17_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot17"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot17"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot18" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_18_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot18"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot18"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot19" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_19_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot19"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot19"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="shop_slot20" type="Panel" parent="CanvasLayer/shop_ui/product_frame/GridContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="shop_slot_20_button" type="Button" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot20"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+
+[node name="shop_slot_sprite" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/GridContainer/shop_slot20"]
+position = Vector2(16, 16)
+texture = SubResource("PlaceholderTexture2D_i041x")
+
+[node name="economy_manager" type="Node" parent="CanvasLayer/shop_ui/product_frame"]
+script = ExtResource("6_j38rk")
+
+[node name="price" type="Label" parent="CanvasLayer/shop_ui/product_frame/economy_manager"]
+offset_left = 33.6
+offset_top = 155.2
+offset_right = 185.6
+offset_bottom = 191.2
+scale = Vector2(0.5, 0.5)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("7_wuap1")
+text = "1"
+label_settings = SubResource("LabelSettings_bsauq")
+horizontal_alignment = 1
+
+[node name="demand_status_icon" type="Sprite2D" parent="CanvasLayer/shop_ui/product_frame/economy_manager"]
+position = Vector2(172, 159.6)
+scale = Vector2(0.465, 0.465)
+texture = ExtResource("8_p01hw")
+
+[node name="demand_status_message" type="Label" parent="CanvasLayer/shop_ui/product_frame/economy_manager"]
+offset_left = 167.5
+offset_top = 166.8
+offset_right = 207.5
+offset_bottom = 189.8
+scale = Vector2(0.25, 0.25)
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_fonts/font = ExtResource("7_wuap1")
+text = "HIGH"
+
+[node name="Title_Panel" type="Panel" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = -17.0
+offset_right = 223.0
+offset_bottom = 8.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_7jk30")
+
+[node name="Shop_Title" type="Label" parent="CanvasLayer/shop_ui/Title_Panel"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.75
+offset_right = 135.0
+offset_bottom = 29.75
+theme_override_fonts/font = ExtResource("7_wuap1")
+text = "Phillip's Shop"
+
+[node name="sell_buy_toggle_button" type="CheckButton" parent="CanvasLayer/shop_ui"]
+material = SubResource("ShaderMaterial_gqdbh")
+layout_mode = 0
+offset_left = 71.0
+offset_top = 50.0
+offset_right = 115.0
+offset_bottom = 74.0
+scale = Vector2(0.31, 0.31)
+
+[node name="Sell_Buy" type="Label" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 20.5
+offset_top = 50.0
+offset_right = 80.5
+offset_bottom = 71.0
+scale = Vector2(0.7, 0.7)
+theme_override_fonts/font = ExtResource("7_wuap1")
+text = "Sell/Buy"
+
+[node name="page_indicator_frame" type="GridContainer" parent="CanvasLayer/shop_ui"]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 165.0
+offset_right = 148.0
+offset_bottom = 212.0
+scale = Vector2(0.505, 0.505)
+columns = 3
+
+[node name="previous_page" type="Button" parent="CanvasLayer/shop_ui/page_indicator_frame"]
+layout_mode = 2

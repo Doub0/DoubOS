@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://ua78g7bj3cx0"]
+
+[ext_resource type="Texture2D" uid="uid://b7kyjidqqoh2k" path="res://assets/flint_onground.png" id="1_ff6y1"]
+[ext_resource type="Script" path="res://flint.gd" id="1_s33x5"]
+[ext_resource type="Resource" uid="uid://cx6p02h6u7nbq" path="res://inventory/flint.tres" id="2_c5l6u"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_05i2e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ff6y1")
+}],
+"loop": true,
+"name": &"flint",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"no_flint",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dscdd"]
+radius = 15.6205
+
+[node name="flint" type="Node2D"]
+script = ExtResource("1_s33x5")
+item = ExtResource("2_c5l6u")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+rotation = 1.30376
+sprite_frames = SubResource("SpriteFrames_05i2e")
+animation = &"flint"
+
+[node name="interactable_area" type="Area2D" parent="."]
+visible = false
+rotation = 1.30376
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="interactable_area"]
+shape = SubResource("CircleShape2D_dscdd")
+
+[connection signal="body_entered" from="interactable_area" to="." method="_on_interactable_area_body_entered"]

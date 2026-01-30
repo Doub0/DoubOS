@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=3 format=3 uid="uid://cahdk7mfe1pko"]
+
+[ext_resource type="Script" path="res://inventory/inventory_item.gd" id="1_8mv7f"]
+[ext_resource type="Texture2D" uid="uid://0eu1ddxkw3ka" path="res://assets/stalagmite_shard.png" id="2_g5l2b"]
+
+[resource]
+script = ExtResource("1_8mv7f")
+name = "Stalagmite Shards"
+texture = ExtResource("2_g5l2b")

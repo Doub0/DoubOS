@@ -1,0 +1,77 @@
+[gd_scene load_steps=10 format=3 uid="uid://deooq4iep5pp"]
+
+[ext_resource type="Script" path="res://whitepine_tree.gd" id="1_7v88g"]
+[ext_resource type="Resource" uid="uid://yvthj864bnge" path="res://whitepinecone.tres" id="2_4fs0s"]
+[ext_resource type="Texture2D" uid="uid://bub8vrbx33l8b" path="res://assets/white_pine.png" id="3_jab6w"]
+[ext_resource type="Texture2D" uid="uid://dvwuvbymovs2" path="res://pixilart-frames/pixil-frame-0 - 2024-02-08T084127.840.png" id="4_i0qra"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hkulf"]
+atlas = ExtResource("3_jab6w")
+region = Rect2(0, 0, 75, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_acxab"]
+atlas = ExtResource("3_jab6w")
+region = Rect2(75, 0, 75, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hp274"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hkulf")
+}],
+"loop": true,
+"name": &"no_pinecone",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_acxab")
+}],
+"loop": true,
+"name": &"pinecone",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gjb7o"]
+radius = 50.4876
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_h26jr"]
+
+[node name="whitepine_tree" type="Node2D"]
+z_index = 1
+script = ExtResource("1_7v88g")
+item = ExtResource("2_4fs0s")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_hp274")
+animation = &"pinecone"
+
+[node name="pickable_area" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="pickable_area"]
+visible = false
+position = Vector2(-4, 17)
+shape = SubResource("CircleShape2D_gjb7o")
+
+[node name="growth_timer" type="Timer" parent="."]
+wait_time = 3.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+visible = false
+position = Vector2(-4, 25)
+shape = SubResource("CircleShape2D_h26jr")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.321569, 0.321569, 0.321569, 0.560784)
+show_behind_parent = true
+position = Vector2(27, 33)
+scale = Vector2(1.47461, 0.931153)
+texture = ExtResource("4_i0qra")
+
+[connection signal="body_entered" from="pickable_area" to="." method="_on_pickable_area_body_entered" flags=18]
+[connection signal="body_exited" from="pickable_area" to="." method="_on_pickable_area_body_exited" flags=18]
+[connection signal="timeout" from="growth_timer" to="." method="_on_growth_timer_timeout" flags=18]

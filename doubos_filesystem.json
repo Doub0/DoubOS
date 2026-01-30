@@ -1,0 +1,197 @@
+{
+  "name": "/",
+  "is_directory": true,
+  "owner": "root",
+  "permissions": "rwxr-xr-x",
+  "created_at": "2026-01-30T10:52:16.250950",
+  "modified_at": "2026-01-30T10:52:16.250954",
+  "size": 0,
+  "children": {
+    "bin": {
+      "name": "bin",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.250969",
+      "modified_at": "2026-01-30T10:52:16.250969",
+      "size": 0,
+      "children": {}
+    },
+    "sbin": {
+      "name": "sbin",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.250977",
+      "modified_at": "2026-01-30T10:52:16.250977",
+      "size": 0,
+      "children": {}
+    },
+    "etc": {
+      "name": "etc",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.250981",
+      "modified_at": "2026-01-30T10:52:16.250981",
+      "size": 0,
+      "children": {
+        "motd": {
+          "name": "motd",
+          "is_directory": false,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.251023",
+          "modified_at": "2026-01-30T10:52:16.251024",
+          "size": 58,
+          "content": "Welcome to DoubOS!\nA powerful operating system simulator.\n"
+        },
+        "hosts": {
+          "name": "hosts",
+          "is_directory": false,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.251027",
+          "modified_at": "2026-01-30T10:52:16.251028",
+          "size": 20,
+          "content": "127.0.0.1 localhost\n"
+        }
+      }
+    },
+    "home": {
+      "name": "home",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.250984",
+      "modified_at": "2026-01-30T10:52:16.250984",
+      "size": 0,
+      "children": {
+        "admin": {
+          "name": "admin",
+          "is_directory": true,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.250990",
+          "modified_at": "2026-01-30T10:52:16.250991",
+          "size": 0,
+          "children": {
+            ".profile": {
+              "name": ".profile",
+              "is_directory": false,
+              "owner": "root",
+              "permissions": "rwxr-xr-x",
+              "created_at": "2026-01-30T10:52:16.251032",
+              "modified_at": "2026-01-30T10:52:16.251032",
+              "size": 48,
+              "content": "# Admin profile\nexport PATH=/bin:/usr/bin:/sbin\n"
+            }
+          }
+        },
+        "guest": {
+          "name": "guest",
+          "is_directory": true,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.250995",
+          "modified_at": "2026-01-30T10:52:16.250996",
+          "size": 0,
+          "children": {}
+        }
+      }
+    },
+    "tmp": {
+      "name": "tmp",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.250998",
+      "modified_at": "2026-01-30T10:52:16.250998",
+      "size": 0,
+      "children": {}
+    },
+    "var": {
+      "name": "var",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.251000",
+      "modified_at": "2026-01-30T10:52:16.251000",
+      "size": 0,
+      "children": {
+        "log": {
+          "name": "log",
+          "is_directory": true,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.251004",
+          "modified_at": "2026-01-30T10:52:16.251005",
+          "size": 0,
+          "children": {
+            "system.log": {
+              "name": "system.log",
+              "is_directory": false,
+              "owner": "root",
+              "permissions": "rwxr-xr-x",
+              "created_at": "2026-01-30T10:52:16.251043",
+              "modified_at": "2026-01-30T10:52:16.251043",
+              "size": 48,
+              "content": "[2026-01-30 10:52:16.251033] DoubOS initialized\n"
+            }
+          }
+        }
+      }
+    },
+    "usr": {
+      "name": "usr",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.251007",
+      "modified_at": "2026-01-30T10:52:16.251007",
+      "size": 0,
+      "children": {
+        "bin": {
+          "name": "bin",
+          "is_directory": true,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.251010",
+          "modified_at": "2026-01-30T10:52:16.251011",
+          "size": 0,
+          "children": {}
+        },
+        "local": {
+          "name": "local",
+          "is_directory": true,
+          "owner": "root",
+          "permissions": "rwxr-xr-x",
+          "created_at": "2026-01-30T10:52:16.251014",
+          "modified_at": "2026-01-30T10:52:16.251014",
+          "size": 0,
+          "children": {}
+        }
+      }
+    },
+    "dev": {
+      "name": "dev",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.251016",
+      "modified_at": "2026-01-30T10:52:16.251017",
+      "size": 0,
+      "children": {}
+    },
+    "proc": {
+      "name": "proc",
+      "is_directory": true,
+      "owner": "root",
+      "permissions": "rwxr-xr-x",
+      "created_at": "2026-01-30T10:52:16.251019",
+      "modified_at": "2026-01-30T10:52:16.251019",
+      "size": 0,
+      "children": {}
+    }
+  }
+}

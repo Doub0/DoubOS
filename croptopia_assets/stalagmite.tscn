@@ -1,0 +1,62 @@
+[gd_scene load_steps=7 format=3 uid="uid://d3mvgdfacbl3l"]
+
+[ext_resource type="Script" path="res://stalagmite.gd" id="1_2vdyw"]
+[ext_resource type="Texture2D" uid="uid://i3ej3y8xoomi" path="res://assets/stalagmite_improved.png" id="1_edg6h"]
+[ext_resource type="Texture2D" uid="uid://dh1dknweh4dj8" path="res://assets/stalagmite.png" id="1_g0cjs"]
+[ext_resource type="Resource" uid="uid://cahdk7mfe1pko" path="res://stalagmite_shards.tres" id="2_ds6ca"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_drx1x"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_edg6h")
+}],
+"loop": true,
+"name": &"chipped",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_g0cjs")
+}],
+"loop": true,
+"name": &"elongated",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ytlv2"]
+radius = 14.0
+height = 48.0
+
+[node name="stalagmite" type="Node2D"]
+z_index = 1
+script = ExtResource("1_2vdyw")
+item = ExtResource("2_ds6ca")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_drx1x")
+animation = &"elongated"
+
+[node name="Area2D" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CapsuleShape2D_ytlv2")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.694118)
+z_index = -1
+position = Vector2(-1.42109e-14, 3.75)
+scale = Vector2(1.6875, 0.921875)
+texture = ExtResource("1_edg6h")
+
+[node name="PointLight2D" type="PointLight2D" parent="Sprite2D"]
+position = Vector2(8.42125e-15, -1.8983)
+scale = Vector2(1, 1.25424)
+color = Color(0, 0, 0, 1)
+blend_mode = 2
+range_z_min = 0
+range_z_max = 0
+texture = ExtResource("1_edg6h")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
