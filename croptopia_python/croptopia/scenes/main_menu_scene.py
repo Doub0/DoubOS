@@ -24,7 +24,7 @@ class MainMenuScene(Scene):
     """Full main.tscn recreation with real assets and proper layout"""
     
     def __init__(self, engine):
-        super().__init__(engine)
+        super().__init__('main_menu', engine)
         self.engine = engine
         
         # Assets (from TSCN ext_resource declarations)
