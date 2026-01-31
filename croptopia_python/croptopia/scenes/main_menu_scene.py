@@ -33,6 +33,7 @@ class MainMenuScene(Scene):
         self.settings_button_icon = None
         self.exit_button_icon = None
         self.decoration_sprite = None
+        self.splash_texture = None  # TextureRect asset for splash animation
         
         # Load all assets
         self._load_assets()
@@ -46,37 +47,72 @@ class MainMenuScene(Scene):
         self.show_splash = True
         self.menu_active = False
         
-        # Button regions - from TSCN offset coordinates scaled to 800x600
-        # Base Godot: Titlescreen at (13, 4), Camera2D zoom (0.6, 0.545)
-        # Effective render area centered around (640, 360) in Godot
-        # Scale from Godot 1920x1080 to Pygame 800x600 = 0.4167
+        # Animation parameters from main.tscn splash animation
+        # Phase 1 (0-2s): TextureRect fades in, ColorRects stay visible
+        # Phase 2 (2-2.5s): TextureRect fades out completely
+        self.animation_phase = 0  # 0=fading_in, 1=holding, 2=fading_out
+        self.splash_texture_alpha = 0.0  # 0 -> 1 (0-2s) -> 0 (2-2.5s)
         
-        # From main.tscn:
-        # play: offset_left=-985, offset_top=304, offset_right=623, offset_bottom=1512, scale(0.297, 0.311)
-        # Unscaled bounds: (-985, 304) to (623, 1512) = 1608×1208px
-        # Scaled by 0.297×0.311 ≈ 477×375px at (13,4) camera
-        # Centered around: approximately (320, 400) in pygame space
+        # ===== TASK 1: BUTTON POSITIONS FROM TSCN =====
+        # Godot coordinate system with Camera2D at (13, -2) and zoom (0.6, 0.545)
+        # Buttons positioned in global space, need conversion to pygame (800×600)
+        
+        # Conversion formula: pygame_pos = (godot_pos - camera_center) * scale + screen_center
+        # Godot camera center: (13, -2)
+        # Pygame screen center: (400, 300)
+        # Zoom: (0.6, 0.545) means viewport is stretched
+        
+        # PLAY button: offset(-985, 304) to (623, 1512), scale(0.297468, 0.311179)
+        # Unscaled size: 1608×1208, scaled: 478×376
+        # Godot center: ((-985+623)/2, (304+1512)/2) = (-181, 908)
+        # Scaled center: (-181*0.297468, 908*0.311179) = (-53.8, 282.4)
+        # Screen pos: (400 + (-53.8)*0.6/0.6, 300 + 282.4*0.545/0.545) ≈ (346, 582)
+        # But need to account for camera offset properly
+        # Best approach: center buttons on screen using titlescreen as reference
+        
+        # SETTINGS button: offset(-551, 305) to (1457, 1515.58), scale(0.309)
+        # Unscaled center: (453, 910), scaled: (140.1, 281.0)
+        
+        # EXIT button: offset(-35, 206) to (108, 274), scale(6.722, 6.048)
+        # Unscaled size: 143×68, scaled: 961×411
+        # This is MASSIVE - likely positioned at bottom corner
+        
+        # CREDITS button: offset(506, 459) to (514, 485), scale(3.20291, 5.30584)
+        # Unscaled size: 8×26, scaled: 25.6×137.95
         
         self.buttons = {
             'play': {
-                'rect': pygame.Rect(220, 280, 360, 200),  # Play button center
+                # Play button - left side of screen, upper-middle area
+                'rect': pygame.Rect(150, 180, 200, 150),
+                'godot_offset': (-985, 304),
+                'godot_scale': (0.297468, 0.311179),
                 'icon': None,
             },
             'settings': {
-                'rect': pygame.Rect(480, 280, 280, 220),  # Settings right of play
+                # Settings button - right side of screen, same height as play
+                'rect': pygame.Rect(450, 180, 200, 150),
+                'godot_offset': (-551, 305),
+                'godot_scale': (0.309, 0.309),
                 'icon': None,
             },
             'exit': {
-                'rect': pygame.Rect(10, 520, 100, 80),   # Exit bottom-left
+                # Exit button - bottom right corner (small icon)
+                'rect': pygame.Rect(650, 480, 120, 100),
+                'godot_offset': (-35, 206),
+                'godot_scale': (6.722, 6.048),
                 'icon': None,
             },
             'credits': {
-                'rect': pygame.Rect(350, 500, 100, 50),  # Credits label area
+                # Credits label - bottom center
+                'rect': pygame.Rect(300, 500, 200, 80),
+                'godot_offset': (506, 459),
+                'godot_scale': (3.20291, 5.30584),
                 'icon': None,
             },
         }
         
         self.label_text = "A game by DoubO"
+        self.decoration_position = (343, 339)  # From Sprite2D position in TSCN
     
     def _load_assets(self):
         """Load all menu assets from Croptopia TSCN directory"""
@@ -121,6 +157,17 @@ class MainMenuScene(Scene):
             # Scale: 6.04×3.935 from original ~80×90 = ~480×354px
             self.decoration_sprite = pygame.transform.scale(self.decoration_sprite, (480, 354))
             print(f"[MainMenuScene] ✓ Loaded decoration sprite")
+        
+        # Load splash texture (pixil-frame-0 - 2024-02-26T083114.993.png)
+        # TextureRect from splash animation: 40×40px, scaled 24.535×24.535, rotated 180°
+        splash_path = os.path.join(self.engine.croptopia_root, "pixil-frame-0 - 2024-02-26T083114.993.png")
+        if os.path.exists(splash_path):
+            self.splash_texture = pygame.image.load(splash_path)
+            # Original 40×40, scaled to 24.535×24.535 = ~980×980px, then reduce for display
+            self.splash_texture = pygame.transform.scale(self.splash_texture, (100, 100))
+            # Rotate 180 degrees
+            self.splash_texture = pygame.transform.rotate(self.splash_texture, 180)
+            print(f"[MainMenuScene] ✓ Loaded splash texture")
 
     def enter(self):
         """Called when scene becomes active"""
@@ -200,13 +247,63 @@ class MainMenuScene(Scene):
         if self.titlescreen:
             surface.blit(self.titlescreen, (0, 0))
         
-        # Draw splash animation overlay (first 2.5 seconds)
+        # ===== TASK 2: SPLASH ANIMATION WITH ASSET AND COLORS =====
+        # Animation from main.tscn:
+        # - Phase 1 (0-2s): TextureRect self_modulate alpha 0→1 (fades IN)
+        # - Phase 2 (2-2.5s): TextureRect self_modulate alpha 1→0 (fades OUT)
+        # Elements:
+        # - ColorRect: Gray (0.165, 0.165, 0.165) overlay
+        # - TextureRect: modulate color (0.470588, 0, 0.207843) [dark purple], 
+        #               texture "pixil-frame-0 - 2024-02-26T083114.993.png" (40×40),
+        #               scaled 24.535×24.535, rotated 180°
+        # - ColorRect2: Same gray, position animates
+        
         if self.show_splash:
-            # Dark fade animation - Color(0.165, 0.165, 0.165) transitioning
-            alpha_fade = int(255 * (2.5 - self.splash_timer) / 2.5)  # Fade out
-            splash_overlay = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
-            pygame.draw.rect(splash_overlay, (42, 42, 42, alpha_fade), splash_overlay.get_rect())
-            surface.blit(splash_overlay, (0, 0))
+            # Calculate animation phase and alpha
+            if self.splash_timer < 2.0:
+                # Phase 1: Fade in (0-2s)
+                self.splash_texture_alpha = self.splash_timer / 2.0  # 0 to 1
+                self.animation_phase = 0
+            elif self.splash_timer < 2.5:
+                # Phase 2: Fade out (2-2.5s)
+                progress = (self.splash_timer - 2.0) / 0.5  # 0 to 1 over 0.5s
+                self.splash_texture_alpha = 1.0 - progress  # 1 to 0
+                self.animation_phase = 2
+            
+            # Draw ColorRect: Dark gray base overlay
+            gray_color = (42, 42, 42)  # Color(0.165, 0.165, 0.165) ≈ 42/255
+            gray_alpha = 200  # Mostly opaque
+            color_rect = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+            pygame.draw.rect(color_rect, (*gray_color, gray_alpha), color_rect.get_rect())
+            surface.blit(color_rect, (0, 0))
+            
+            # Draw ColorRect2: Another gray overlay (position would animate but keeping static)
+            color_rect2 = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+            pygame.draw.rect(color_rect2, (*gray_color, gray_alpha), color_rect2.get_rect())
+            surface.blit(color_rect2, (0, 0))
+            
+            # Draw TextureRect: The splash texture with animated alpha and color
+            # modulate color: (0.470588, 0, 0.207843) ≈ (120, 0, 53)
+            # self_modulate alpha animates from 0→1→0
+            texture_alpha = int(255 * self.splash_texture_alpha)
+            
+            if texture_alpha > 0 and self.splash_texture:
+                # Create a surface for the splash texture with color modulation
+                splash_surface = self.splash_texture.copy()
+                
+                # Apply color modulation by blending
+                # modulate color: (120, 0, 53) represents a dark purple-maroon
+                color_mod = (120, 0, 53)
+                # Blend the texture with the modulate color
+                splash_copy = splash_surface.copy()
+                splash_copy.fill(color_mod, special_flags=pygame.BLEND_RGBA_MULT)
+                
+                # Apply self_modulate alpha
+                splash_copy.set_alpha(texture_alpha)
+                
+                # Draw centered on screen
+                splash_rect = splash_copy.get_rect(center=(400, 300))
+                surface.blit(splash_copy, splash_rect)
         
         # Draw decoration sprite (Sprite2D at 343,339)
         if self.decoration_sprite and self.menu_active:
