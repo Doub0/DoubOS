@@ -10,7 +10,6 @@ import subprocess
 import os
 from window_manager import WindowManager
 from windowed_apps import TerminalApp, FileExplorerApp, TextEditorApp, CalculatorApp, SettingsApp
-from croptopia_ultimate import EnhancedCroptopia
 from games_menu import GamesMenuApp
 
 
@@ -27,6 +26,9 @@ class DoubOSDesktop:
         self.root.title("DoubOS Desktop")
         self.root.geometry("1200x800")
         self.root.configure(bg="#1e1e2e")
+        
+        # Track clock callback to cancel it on exit
+        self.clock_callback_id = None
         
         # Theme colors
         self.colors = {
@@ -52,6 +54,9 @@ class DoubOSDesktop:
         # Create window manager AFTER desktop_frame exists
         self.window_manager = WindowManager(self.desktop_frame)
         print("✓ Window manager initialized")
+        
+        # Setup window close handler
+        self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         
         # Start system services
         self.update_clock()
@@ -336,11 +341,17 @@ class DoubOSDesktop:
         
     def update_clock(self):
         """Update taskbar clock"""
-        now = datetime.now()
-        time_str = now.strftime("%I:%M %p")
-        date_str = now.strftime("%m/%d/%Y")
-        self.clock_label.configure(text=f"{time_str}\n{date_str}")
-        self.root.after(1000, self.update_clock)
+        try:
+            if not self.root.winfo_exists():
+                return  # Root window was destroyed
+            
+            now = datetime.now()
+            time_str = now.strftime("%I:%M %p")
+            date_str = now.strftime("%m/%d/%Y")
+            self.clock_label.configure(text=f"{time_str}\n{date_str}")
+            self.clock_callback_id = self.root.after(1000, self.update_clock)
+        except:
+            pass  # Silently fail if widget is destroyed
         
     # Application launchers - opens inside simulation windows
     def open_terminal(self):
@@ -376,10 +387,11 @@ class DoubOSDesktop:
                                        SettingsApp)
         
     def open_croptopia(self):
-        """Open Croptopia Enhanced"""
-        print("Opening Croptopia Enhanced...")
-        self.window_manager.open_window("Croptopia Enhanced 🌾", 900, 700,
-                                       EnhancedCroptopia)
+        """Open Croptopia (current build)"""
+        print("Opening Croptopia (current build)...")
+        from croptopia_os_wrapper import CroptopiaGameWindow
+        self.window_manager.open_window("Croptopia 🌾", 900, 700,
+                                       CroptopiaGameWindow)
         
     def open_games(self):
         """Open games menu"""
@@ -449,7 +461,30 @@ class DoubOSDesktop:
         if messagebox.askyesno("Shutdown", "⏻ Shutdown DoubOS?\n\nAll unsaved work will be lost."):
             self.kernel.shutdown()
             self.root.quit()
+    
+    def _on_closing(self):
+        """Cleanup callbacks and close the window"""
+        if self.clock_callback_id:
+            try:
+                self.root.after_cancel(self.clock_callback_id)
+                self.clock_callback_id = None
+            except:
+                pass
+        self.root.destroy()
+    
+    def _on_closing_silent(self):
+        """Silent cleanup without destroying (root may already be destroyed)"""
+        if self.clock_callback_id:
+            try:
+                self.root.after_cancel(self.clock_callback_id)
+                self.clock_callback_id = None
+            except:
+                pass
             
     def run(self):
         """Run the desktop environment"""
-        self.root.mainloop()
+        try:
+            self.root.mainloop()
+        finally:
+            # Ensure cleanup happens even if mainloop exits abnormally
+            self._on_closing_silent()

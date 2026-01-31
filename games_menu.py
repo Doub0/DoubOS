@@ -3,7 +3,9 @@ Games Menu Application for DoubOS
 """
 
 import tkinter as tk
-from croptopia_ultimate_complete import CroptopiaUltimateGame as UltimatecroptopiaGame
+import subprocess
+import sys
+import os
 
 
 class GamesMenuApp(tk.Frame):
@@ -29,14 +31,9 @@ class GamesMenuApp(tk.Frame):
         
         games = [
             {
-                "name": "🌾 Ultimate Croptopia v3.5",
-                "desc": "Asset-enhanced farming with full Godot project integration - 200+ assets available",
+                "name": "🌾 Croptopia",
+                "desc": "Current Croptopia build (croptopia_python main.py)",
                 "cmd": self.launch_croptopia
-            },
-            {
-                "name": "🎮 Coming Soon",
-                "desc": "More games will be added soon!",
-                "cmd": None
             }
         ]
         
@@ -70,9 +67,12 @@ class GamesMenuApp(tk.Frame):
             btn.pack(anchor=tk.E, pady=(10, 0))
             
     def launch_croptopia(self):
-        """Launch Ultimate Croptopia game"""
-        if self.window_manager:
-            self.window_manager.open_window("🌾 Ultimate Croptopia v3.5 - Asset Enhanced", 1400, 700, UltimatecroptopiaGame)
-        else:
+        """Launch current Croptopia build (croptopia_python)"""
+        try:
+            repo_root = os.getcwd()
+            venv_python = os.path.join(repo_root, ".venv", "Scripts", "python.exe")
+            python_exe = venv_python if os.path.exists(venv_python) else sys.executable
+            subprocess.Popen([python_exe, "main.py"], cwd=os.path.join(repo_root, "croptopia_python"))
+        except Exception:
             import tkinter.messagebox as mb
-            mb.showinfo("Croptopia", "Game not available")
+            mb.showerror("Croptopia", "Failed to launch Croptopia")
