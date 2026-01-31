@@ -1,0 +1,664 @@
+[gd_scene load_steps=21 format=3 uid="uid://hunkaridmsnl"]
+
+[ext_resource type="Texture2D" uid="uid://cbwlfmxkoabj2" path="res://assets/Item Assets/placeables/construction_table.png" id="1_jlwn6"]
+[ext_resource type="Script" path="res://scenes/Placeables/construction_table.gd" id="1_ysp3d"]
+[ext_resource type="Texture2D" uid="uid://6dpuflpmnsmm" path="res://assets/ui_bg.png" id="3_srqdi"]
+[ext_resource type="StyleBox" uid="uid://rd3mq4uu1t1k" path="res://scenes/formats/border_format.tres" id="4_2kp7y"]
+[ext_resource type="FontFile" uid="uid://uynswcck0os1" path="res://fonts/pixelated.ttf" id="5_g8dql"]
+[ext_resource type="Texture2D" uid="uid://bmqbpvj0rykee" path="res://assets/example_house.png" id="6_4ptsv"]
+[ext_resource type="Texture2D" uid="uid://555jircu77fi" path="res://assets/grass_demo.png" id="7_2f55u"]
+[ext_resource type="Texture2D" uid="uid://dihy2r4gmmt43" path="res://assets/Item Assets/placeables/garden_bed_tier_1.png" id="8_uwupg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gq0xb"]
+atlas = ExtResource("1_jlwn6")
+region = Rect2(0, 0, 20, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xabrg"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gq0xb")
+}],
+"loop": true,
+"name": &"sprite",
+"speed": 5.0
+}]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ic714"]
+texture = ExtResource("3_srqdi")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f5feb"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cqeyt"]
+texture = ExtResource("7_2f55u")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_y44yf"]
+texture = ExtResource("6_4ptsv")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xmqgd"]
+bg_color = Color(0.968627, 0.658824, 0.12549, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_86sva"]
+texture = ExtResource("8_uwupg")
+region_rect = Rect2(0, 0, 102, 59)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4huch"]
+radius = 33.0151
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d2805"]
+size = Vector2(16, 7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o7qhi"]
+bg_color = Color(0, 0, 0, 0.415686)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="TileSet" id="TileSet_yc3xk"]
+
+[node name="construction_table" type="StaticBody2D"]
+z_index = 1
+script = ExtResource("1_ysp3d")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xabrg")
+animation = &"sprite"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ui" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="bg" type="Panel" parent="CanvasLayer/ui"]
+layout_mode = 0
+offset_left = 65.0
+offset_top = 59.0
+offset_right = 1069.0
+offset_bottom = 583.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_ic714")
+
+[node name="Panel" type="Panel" parent="CanvasLayer/ui"]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 99.0
+offset_right = 736.0
+offset_bottom = 148.0
+theme_override_styles/panel = ExtResource("4_2kp7y")
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/Panel"]
+layout_mode = 0
+offset_left = 51.0
+offset_top = 4.0
+offset_right = 177.0
+offset_bottom = 27.0
+scale = Vector2(2, 2)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("5_g8dql")
+text = "Construction Menu"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/ui"]
+layout_mode = 0
+offset_left = 119.0
+offset_top = 156.0
+offset_right = 735.0
+offset_bottom = 511.0
+scroll_vertical = 57
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/ui/ScrollContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="6x6_house" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer"]
+custom_minimum_size = Vector2(232, 204)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_f5feb")
+
+[node name="Panel2" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 70.0
+offset_bottom = 38.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel2"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel4" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel2"]
+layout_mode = 0
+offset_top = 64.0
+offset_right = 64.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 70.0
+offset_bottom = 38.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel4" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_top = 64.0
+offset_right = 64.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel5" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_top = 96.0
+offset_right = 64.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel6" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_top = 128.0
+offset_right = 64.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel7" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_top = 160.0
+offset_right = 64.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel8" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 32.0
+offset_right = 128.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel9" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 128.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel10" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 96.0
+offset_right = 128.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel11" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 128.0
+offset_right = 128.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel12" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 160.0
+offset_right = 128.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel13" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 32.0
+offset_right = 192.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel14" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 64.0
+offset_right = 192.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel15" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 96.0
+offset_right = 192.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel16" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 128.0
+offset_right = 192.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel17" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 160.0
+offset_right = 192.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel18" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 32.0
+offset_right = 220.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel19" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 64.0
+offset_right = 220.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel20" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 96.0
+offset_right = 220.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel21" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 128.0
+offset_right = 220.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel22" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 160.0
+offset_right = 220.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel23" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel24" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_right = 192.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel25" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_right = 220.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/6x6_house"]
+top_level = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+offset_left = 155.0
+offset_top = 112.0
+offset_right = 323.0
+offset_bottom = 344.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_y44yf")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_2kp7y")
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Panel3"]
+layout_mode = 2
+offset_left = 42.0
+offset_top = 35.0
+offset_right = 130.0
+offset_bottom = 77.0
+scale = Vector2(1.25, 1.25)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("5_g8dql")
+text = "6x6 HOUSE
+- Planks, nails"
+
+[node name="build_button" type="Button" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Panel3"]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 159.0
+offset_right = 128.0
+offset_bottom = 190.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+theme_override_fonts/font = ExtResource("5_g8dql")
+theme_override_styles/normal = SubResource("StyleBoxFlat_xmqgd")
+text = "BUILD"
+metadata/Object_selected = "6x6 House"
+
+[node name="Farm_Bed" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer"]
+custom_minimum_size = Vector2(232, 204)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_f5feb")
+
+[node name="Panel" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed"]
+top_level = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+offset_left = 158.0
+offset_top = 384.0
+offset_right = 319.0
+offset_bottom = 509.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_86sva")
+
+[node name="Panel2" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 70.0
+offset_bottom = 38.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel2"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel4" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel2"]
+layout_mode = 0
+offset_top = 64.0
+offset_right = 64.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed"]
+show_behind_parent = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 70.0
+offset_bottom = 38.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel3" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_top = 32.0
+offset_right = 64.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel4" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_top = 64.0
+offset_right = 64.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel5" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_top = 96.0
+offset_right = 64.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel6" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_top = 128.0
+offset_right = 64.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel7" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_top = 160.0
+offset_right = 64.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel8" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 32.0
+offset_right = 128.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel9" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 64.0
+offset_right = 128.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel10" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 96.0
+offset_right = 128.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel11" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 128.0
+offset_right = 128.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel12" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 160.0
+offset_right = 128.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel13" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 32.0
+offset_right = 192.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel14" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 64.0
+offset_right = 192.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel15" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 96.0
+offset_right = 192.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel16" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 128.0
+offset_right = 192.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel17" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 160.0
+offset_right = 192.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel18" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 32.0
+offset_right = 220.0
+offset_bottom = 64.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel19" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 64.0
+offset_right = 220.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel20" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 96.0
+offset_right = 220.0
+offset_bottom = 128.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel21" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 128.0
+offset_right = 220.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel22" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 160.0
+offset_right = 220.0
+offset_bottom = 192.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel23" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 64.0
+offset_right = 128.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel24" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 128.0
+offset_right = 192.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel25" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Farm_Bed/Panel3"]
+layout_mode = 0
+offset_left = 156.0
+offset_right = 220.0
+offset_bottom = 32.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_cqeyt")
+
+[node name="Panel5" type="Panel" parent="CanvasLayer/ui/ScrollContainer/GridContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_2kp7y")
+
+[node name="Label" type="Label" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Panel5"]
+layout_mode = 2
+offset_left = 49.0
+offset_top = 28.0
+offset_right = 137.0
+offset_bottom = 70.0
+scale = Vector2(1.25, 1.25)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("5_g8dql")
+text = "FARM BED
+- Planks, nails"
+
+[node name="build_button" type="Button" parent="CanvasLayer/ui/ScrollContainer/GridContainer/Panel5"]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 159.0
+offset_right = 128.0
+offset_bottom = 190.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
+theme_override_fonts/font = ExtResource("5_g8dql")
+theme_override_styles/normal = SubResource("StyleBoxFlat_xmqgd")
+text = "BUILD"
+metadata/Object_selected = "Garden Bed"
+
+[node name="player_detection" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player_detection"]
+shape = SubResource("CircleShape2D_4huch")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(0, 3.5)
+shape = SubResource("RectangleShape2D_d2805")
+
+[node name="stem_pos" type="Marker2D" parent="."]
+
+[node name="Panel" type="Panel" parent="."]
+show_behind_parent = true
+offset_left = -9.0
+offset_top = -8.0
+offset_right = 9.0
+offset_bottom = 6.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_o7qhi")
+
+[node name="build_grid" type="TileMap" parent="."]
+tile_set = SubResource("TileSet_yc3xk")
+format = 2
+
+[connection signal="pressed" from="CanvasLayer/ui/ScrollContainer/GridContainer/Panel3/build_button" to="." method="_on_6x6_house_pressed"]
+[connection signal="pressed" from="CanvasLayer/ui/ScrollContainer/GridContainer/Panel5/build_button" to="." method="_on_farmer_bed_pressed"]
+[connection signal="body_entered" from="player_detection" to="." method="_on_player_detection_body_entered"]
+[connection signal="body_exited" from="player_detection" to="." method="_on_player_detection_body_exited"]

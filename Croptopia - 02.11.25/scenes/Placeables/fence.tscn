@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://b4vseexmplcfp"]
+
+[ext_resource type="Script" path="res://scenes/Placeables/fence.gd" id="1_qcait"]
+[ext_resource type="Texture2D" uid="uid://d0hdojcax6p1t" path="res://assets/Item Assets/placeables/spruce_fence_grouped_west.png" id="1_ytsku"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cjs6x"]
+
+[node name="fence" type="StaticBody2D"]
+script = ExtResource("1_qcait")
+
+[node name="texture" type="Sprite2D" parent="."]
+texture = ExtResource("1_ytsku")
+
+[node name="hitbox" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_cjs6x")

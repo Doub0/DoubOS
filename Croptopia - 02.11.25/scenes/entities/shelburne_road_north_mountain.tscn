@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dysb8torqjq6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tqbs8"]
+
+[node name="shelburne_road_north_mountain" type="StaticBody2D"]
+
+[node name="texture" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_tqbs8")

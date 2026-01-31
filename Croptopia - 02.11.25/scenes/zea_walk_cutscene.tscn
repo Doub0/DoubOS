@@ -1,0 +1,141 @@
+[gd_scene load_steps=9 format=3 uid="uid://71jhfuf8cd3s"]
+
+[ext_resource type="Script" path="res://scenes/zea_walk_cutscene.gd" id="1_wwsvy"]
+[ext_resource type="SpriteFrames" uid="uid://ch5fvavyqn11m" path="res://scenes/formats/zea_anim.tres" id="2_h20fx"]
+[ext_resource type="SpriteFrames" uid="uid://capsx7er0ipg3" path="res://scenes/formats/player_anim.tres" id="3_2weao"]
+[ext_resource type="Texture2D" uid="uid://dvwuvbymovs2" path="res://pixilart-frames/pixil-frame-0 - 2024-02-08T084127.840.png" id="10_tbisx"]
+
+[sub_resource type="Curve2D" id="Curve2D_rsg3l"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -125.003, 0)
+}
+point_count = 3
+
+[sub_resource type="Curve2D" id="Curve2D_lwrlh"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -60, -175, 0, 0, 0, 0, -376, -175, 0, 0, 0, 0, -945.845, -176, 0, 0, 0, 0, -973.959, -176)
+}
+point_count = 4
+
+[sub_resource type="Animation" id="Animation_tahd1"]
+resource_name = "quest_fade"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("quest_transition/ColorRect:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bxw7a"]
+_data = {
+"quest_fade": SubResource("Animation_tahd1")
+}
+
+[node name="zea_walk_cutscene" type="Node2D"]
+script = ExtResource("1_wwsvy")
+
+[node name="first_cutscene_follow2" type="Path2D" parent="."]
+position = Vector2(7.00256, -8)
+curve = SubResource("Curve2D_rsg3l")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="first_cutscene_follow2"]
+position = Vector2(0.0877401, 0)
+rotates = false
+loop = false
+
+[node name="questcam" type="Camera2D" parent="first_cutscene_follow2/PathFollow2D"]
+zoom = Vector2(3.355, 3.355)
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="first_cutscene_follow2/PathFollow2D"]
+position = Vector2(-16.0903, -9)
+sprite_frames = ExtResource("2_h20fx")
+animation = &"idle"
+flip_h = true
+
+[node name="Pixil-frame-0-2024-02-08t084127_841" type="Sprite2D" parent="first_cutscene_follow2/PathFollow2D/AnimatedSprite2D2"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(13, 15)
+scale = Vector2(0.714286, 0.419643)
+texture = ExtResource("10_tbisx")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="first_cutscene_follow2/PathFollow2D"]
+position = Vector2(349.498, 206.921)
+sprite_frames = ExtResource("3_2weao")
+animation = &"walk_up_idle"
+offset = Vector2(-349.498, -206.921)
+flip_h = true
+
+[node name="Pixil-frame-0-2024-02-08t084127_840" type="Sprite2D" parent="first_cutscene_follow2/PathFollow2D/AnimatedSprite2D"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(-336.588, -191.921)
+scale = Vector2(0.714286, 0.419643)
+texture = ExtResource("10_tbisx")
+
+[node name="second_cutscene_follow2" type="Path2D" parent="."]
+position = Vector2(-1000, -180)
+scale = Vector2(0.995935, 1)
+curve = SubResource("Curve2D_lwrlh")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="second_cutscene_follow2"]
+position = Vector2(-59.88, -175)
+rotation = 3.14159
+h_offset = 0.12
+rotates = false
+loop = false
+
+[node name="questcam" type="Camera2D" parent="second_cutscene_follow2/PathFollow2D"]
+zoom = Vector2(3.355, 3.355)
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="second_cutscene_follow2/PathFollow2D"]
+position = Vector2(16.4299, 14)
+rotation = -3.14159
+scale = Vector2(1.00408, 1)
+sprite_frames = ExtResource("2_h20fx")
+animation = &"idle"
+flip_h = true
+
+[node name="Pixil-frame-0-2024-02-08t084127_841" type="Sprite2D" parent="second_cutscene_follow2/PathFollow2D/AnimatedSprite2D2"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(13, 15)
+scale = Vector2(0.714286, 0.419643)
+texture = ExtResource("10_tbisx")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="second_cutscene_follow2/PathFollow2D"]
+position = Vector2(-350.65, -201.922)
+rotation = -3.14159
+scale = Vector2(1.00408, 1)
+sprite_frames = ExtResource("3_2weao")
+animation = &"walk_up_idle"
+offset = Vector2(-349.498, -206.921)
+flip_h = true
+
+[node name="Pixil-frame-0-2024-02-08t084127_840" type="Sprite2D" parent="second_cutscene_follow2/PathFollow2D/AnimatedSprite2D"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(-336.588, -191.921)
+scale = Vector2(0.714286, 0.419643)
+texture = ExtResource("10_tbisx")
+
+[node name="quest_transition" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_bxw7a")
+}
+
+[node name="ColorRect" type="ColorRect" parent="quest_transition"]
+visible = false
+z_index = 3
+z_as_relative = false
+offset_left = -368.0
+offset_top = -232.0
+offset_right = 420.0
+offset_bottom = 200.0
+color = Color(0, 0, 0, 1)

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=3 format=3 uid="uid://cx6p02h6u7nbq"]
+
+[ext_resource type="Script" path="res://inventory/inventory_item.gd" id="1_iefqk"]
+[ext_resource type="Texture2D" uid="uid://3pq3ekwbklov" path="res://assets/flint_ground.png" id="2_xiert"]
+
+[resource]
+script = ExtResource("1_iefqk")
+name = "Flint"
+texture = ExtResource("2_xiert")

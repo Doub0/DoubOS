@@ -1,0 +1,88 @@
+[gd_scene load_steps=11 format=3 uid="uid://twoxkvap8530"]
+
+[ext_resource type="Texture2D" uid="uid://b0j3sdmisngha" path="res://assets/mayor_floor.png" id="1_8h2qo"]
+[ext_resource type="Texture2D" uid="uid://c5jos811f637" path="res://assets/mayor_walls_1.png" id="2_xv58h"]
+[ext_resource type="Texture2D" uid="uid://chp418201bled" path="res://assets/american_eagle.png" id="3_o3nox"]
+[ext_resource type="Texture2D" uid="uid://djouirbv1suuv" path="res://assets/character_sprites_1.png" id="4_dlf87"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dfab4"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1hp4e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_8h2qo")
+}],
+"loop": true,
+"name": &"mayor_house",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1i2kx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_xv58h")
+}],
+"loop": true,
+"name": &"mayor_wall",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_homcv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_o3nox")
+}],
+"loop": true,
+"name": &"american_eagle",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x1vxm"]
+atlas = ExtResource("4_dlf87")
+region = Rect2(3411, 0, 32, 36)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_a72jx"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x1vxm")
+}],
+"loop": true,
+"name": &"mayor",
+"speed": 5.0
+}]
+
+[node name="inside_house" type="Node2D"]
+
+[node name="base" type="Node2D" parent="."]
+
+[node name="backdrop" type="Panel" parent="base"]
+offset_right = 281.0
+offset_bottom = 200.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dfab4")
+
+[node name="interior_floor" type="AnimatedSprite2D" parent="base"]
+position = Vector2(136, 97)
+sprite_frames = SubResource("SpriteFrames_1hp4e")
+animation = &"mayor_house"
+
+[node name="interior_wall" type="AnimatedSprite2D" parent="base"]
+position = Vector2(136, 82)
+sprite_frames = SubResource("SpriteFrames_1i2kx")
+animation = &"mayor_wall"
+
+[node name="entities" type="Node2D" parent="base"]
+
+[node name="decoration" type="AnimatedSprite2D" parent="base/entities"]
+position = Vector2(134, 54)
+sprite_frames = SubResource("SpriteFrames_homcv")
+animation = &"american_eagle"
+
+[node name="inhabitant" type="AnimatedSprite2D" parent="base/entities"]
+position = Vector2(135, 75)
+sprite_frames = SubResource("SpriteFrames_a72jx")
+animation = &"mayor"

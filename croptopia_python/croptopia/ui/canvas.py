@@ -243,6 +243,160 @@ class HotBar(UIElement):
         self.slot_rects = self._calculate_slot_rects()
 
 
+class MoneyPanel(UIElement):
+    """Money panel with coin icon (from ui.tscn)"""
+
+    BASE_LEFT = 1090.0
+    BASE_TOP = 40.0
+    BASE_RIGHT = 1130.0
+    BASE_BOTTOM = 80.0
+    ICON_POS = (19.0, 19.0)
+    ICON_SCALE = 2.5
+
+    def __init__(self, scale_x: float, scale_y: float):
+        width = (self.BASE_RIGHT - self.BASE_LEFT) * scale_x
+        height = (self.BASE_BOTTOM - self.BASE_TOP) * scale_y
+        super().__init__(self.BASE_LEFT * scale_x, self.BASE_TOP * scale_y, width, height)
+
+        self.money = 0
+        self.coin_surface: Optional[pygame.Surface] = None
+        self.font_path: Optional[str] = None
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+
+    def set_assets(self, coin_surface: Optional[pygame.Surface], font_path: Optional[str]) -> None:
+        self.coin_surface = coin_surface
+        self.font_path = font_path
+
+    def render(self, display: pygame.Surface) -> None:
+        if not self.visible:
+            return
+
+        font = pygame.font.Font(self.font_path, 16) if self.font_path else pygame.font.Font(None, 18)
+        text = font.render(f"{self.money}", True, (200, 200, 100))
+
+        if self.coin_surface:
+            icon_size = int(16 * self.ICON_SCALE * self.scale_x)
+            icon = pygame.transform.scale(self.coin_surface, (icon_size, icon_size))
+            icon_pos = (
+                self.rect.x + int(self.ICON_POS[0] * self.scale_x) - icon_size // 2,
+                self.rect.y + int(self.ICON_POS[1] * self.scale_y) - icon_size // 2,
+            )
+            display.blit(icon, icon_pos)
+
+        text_pos = (self.rect.x + int(5 * self.scale_x), self.rect.y + int(4 * self.scale_y))
+        display.blit(text, text_pos)
+
+
+class DayNightPanel(UIElement):
+    """Day/night panel based on day_and_night.tscn"""
+
+    PANEL_LEFT = 82.0
+    PANEL_TOP = -22.0
+    PANEL_RIGHT = 122.0
+    PANEL_BOTTOM = 18.0
+    PANEL_SCALE = 4.5
+    LAYER_SCALE = 3.0
+
+    def __init__(self, scale_x: float, scale_y: float):
+        base_width = self.PANEL_RIGHT - self.PANEL_LEFT
+        base_height = self.PANEL_BOTTOM - self.PANEL_TOP
+        width = base_width * self.PANEL_SCALE * self.LAYER_SCALE * scale_x
+        height = base_height * self.PANEL_SCALE * self.LAYER_SCALE * scale_y
+        x = self.PANEL_LEFT * self.LAYER_SCALE * scale_x
+        y = self.PANEL_TOP * self.LAYER_SCALE * scale_y
+        super().__init__(x, y, width, height)
+
+        self.panel_surface: Optional[pygame.Surface] = None
+        self.font_path: Optional[str] = None
+        self.day = 1
+        self.time_text = "00:00"
+
+    def set_assets(self, panel_surface: Optional[pygame.Surface], font_path: Optional[str]) -> None:
+        self.panel_surface = panel_surface
+        self.font_path = font_path
+
+    def render(self, display: pygame.Surface) -> None:
+        if not self.visible:
+            return
+
+        if self.panel_surface:
+            panel = pygame.transform.scale(self.panel_surface, (int(self.rect.width), int(self.rect.height)))
+            display.blit(panel, (self.rect.x, self.rect.y))
+
+        font = pygame.font.Font(self.font_path, 14) if self.font_path else pygame.font.Font(None, 18)
+        day_text = font.render(f"Day {self.day}", True, (200, 200, 200))
+        time_text = font.render(self.time_text, True, (200, 200, 200))
+        display.blit(day_text, (self.rect.x + 8, self.rect.y + 6))
+        display.blit(time_text, (self.rect.x + 8, self.rect.y + 24))
+
+
+class DeathScreen(UIElement):
+    """Death screen sprite (hidden by default)"""
+
+    SPRITE_POS = (575.0, 329.0)
+    SPRITE_SCALE = 0.915
+
+    def __init__(self, scale_x: float, scale_y: float):
+        x = self.SPRITE_POS[0] * scale_x
+        y = self.SPRITE_POS[1] * scale_y
+        super().__init__(x, y, 0, 0)
+        self.visible = False
+        self.death_surface: Optional[pygame.Surface] = None
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+
+    def set_assets(self, death_surface: Optional[pygame.Surface]) -> None:
+        self.death_surface = death_surface
+
+    def render(self, display: pygame.Surface) -> None:
+        if not self.visible or not self.death_surface:
+            return
+
+        width = int(self.death_surface.get_width() * self.SPRITE_SCALE * self.scale_x)
+        height = int(self.death_surface.get_height() * self.SPRITE_SCALE * self.scale_y)
+        sprite = pygame.transform.scale(self.death_surface, (width, height))
+        display.blit(sprite, (self.rect.x - width // 2, self.rect.y - height // 2))
+
+
+class StatBars(UIElement):
+    """Health + DRPS bars using ui_bar texture"""
+
+    HEALTH_FRAME = (2.0, 82.0, 215.0, 96.0)
+    HEALTH_LEVEL = (10.0, 87.0, 206.0, 91.0)
+    DRPS_FRAME = (-13.0, 46.0, 198.0, 60.0)
+    DRPS_LEVEL = (-6.0, 51.0, 190.0, 55.0)
+
+    def __init__(self, scale_x: float, scale_y: float):
+        super().__init__(0, 0, 0, 0)
+        self.visible = False
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.ui_bar_surface: Optional[pygame.Surface] = None
+        self.health = 100
+        self.max_health = 100
+        self.drps = 100
+        self.max_drps = 100
+
+    def set_assets(self, ui_bar_surface: Optional[pygame.Surface]) -> None:
+        self.ui_bar_surface = ui_bar_surface
+
+    def render(self, display: pygame.Surface) -> None:
+        if not self.visible:
+            return
+
+        if self.ui_bar_surface:
+            frame_w = int((self.HEALTH_FRAME[2] - self.HEALTH_FRAME[0]) * self.scale_x)
+            frame_h = int((self.HEALTH_FRAME[3] - self.HEALTH_FRAME[1]) * self.scale_y)
+            frame = pygame.transform.scale(self.ui_bar_surface, (frame_w, frame_h))
+            display.blit(frame, (int(self.HEALTH_FRAME[0] * self.scale_x), int(self.HEALTH_FRAME[1] * self.scale_y)))
+
+            frame_w = int((self.DRPS_FRAME[2] - self.DRPS_FRAME[0]) * self.scale_x)
+            frame_h = int((self.DRPS_FRAME[3] - self.DRPS_FRAME[1]) * self.scale_y)
+            frame = pygame.transform.scale(self.ui_bar_surface, (frame_w, frame_h))
+            display.blit(frame, (int(self.DRPS_FRAME[0] * self.scale_x), int(self.DRPS_FRAME[1] * self.scale_y)))
+
+
 class HUD:
     """
     Heads-Up Display - Day/night cycle, money, health, etc.
@@ -433,6 +587,9 @@ class UICanvas(SignalEmitter):
         super().__init__()
         
         self.display_size = display_size
+        self.base_resolution = (1920, 1080)
+        self.scale_x = self.display_size[0] / self.base_resolution[0]
+        self.scale_y = self.display_size[1] / self.base_resolution[1]
         self.croptopia_root = self._resolve_croptopia_root(croptopia_root)
         self.ui_asset_paths: List[str] = []
         self.ui_assets: Dict[str, object] = {}
@@ -455,11 +612,19 @@ class UICanvas(SignalEmitter):
         # UI components
         self.hotbar = HotBar()
         self.hud = HUD()
+        self.money_panel = MoneyPanel(self.scale_x, self.scale_y)
+        self.day_night_panel = DayNightPanel(self.scale_x, self.scale_y)
+        self.death_screen = DeathScreen(self.scale_x, self.scale_y)
+        self.stat_bars = StatBars(self.scale_x, self.scale_y)
         self._apply_ui_assets()
         self.dialog = DialogBox()
         
         # Add to layers
         self.layers[UILayer.HUD].append(self.hotbar)
+        self.layers[UILayer.HUD].append(self.money_panel)
+        self.layers[UILayer.HUD].append(self.day_night_panel)
+        self.layers[UILayer.HUD].append(self.stat_bars)
+        self.layers[UILayer.MENU].append(self.death_screen)
         self.layers[UILayer.DIALOG].append(self.dialog)
         
         print(f"[UICanvas] Initialized ({display_size[0]}x{display_size[1]})")
@@ -471,6 +636,8 @@ class UICanvas(SignalEmitter):
         select_tex = self.ui_assets.get("res://inventory/pixil-frame-0 - 2024-02-05T105702.567.png")
         ui_bar_tex = self.ui_assets.get("res://assets/ui_bar.png")
         money_icon_tex = self.ui_assets.get("res://assets/pixil-frame-0 (5).png")
+        day_night_tex = self.ui_assets.get("res://assets/game_ui_panel.png")
+        death_tex = self.ui_assets.get("res://assets/death.png")
         font_path = self.ui_assets.get("res://fonts/pixelated.ttf")
 
         # Scale hotbar textures to match Godot scale (3x)
@@ -491,6 +658,10 @@ class UICanvas(SignalEmitter):
 
         self.hotbar.set_assets(hotbar_tex, slot_tex, select_tex)
         self.hud.set_assets(ui_bar_tex, money_icon_tex, font_path)
+        self.money_panel.set_assets(money_icon_tex, font_path)
+        self.day_night_panel.set_assets(day_night_tex, font_path)
+        self.death_screen.set_assets(death_tex)
+        self.stat_bars.set_assets(ui_bar_tex)
 
     def _resolve_croptopia_root(self, croptopia_root: Optional[str]) -> Optional[str]:
         """Resolve Croptopia project root path."""
@@ -594,6 +765,7 @@ class UICanvas(SignalEmitter):
                 element.update(delta)
         
         self.hud.update(delta)
+        self.money_panel.money = self.hud.money
     
     def render(self, display: pygame.Surface) -> None:
         """Render all UI layers in order"""

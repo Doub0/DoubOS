@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://26bnm2iyeqy8"]
+
+[ext_resource type="Texture2D" uid="uid://bn3bhyb8ay5km" path="res://assets/mountains_2.png" id="1_slx7c"]
+
+[node name="michael_plot_mountain" type="StaticBody2D"]
+
+[node name="texture" type="Sprite2D" parent="."]
+texture = ExtResource("1_slx7c")
+region_enabled = true
+region_rect = Rect2(3079, 0, 1200, 3161)

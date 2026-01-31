@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cfr86rhq3ayt4"]
+
+[ext_resource type="Texture2D" uid="uid://di3brfkm6sul" path="res://assets/mountains_shelburne_road.png" id="1_am5sy"]
+
+[node name="shelburne_town_mountain" type="StaticBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_am5sy")
+region_enabled = true
+region_rect = Rect2(0, 0, 3582, 1693)

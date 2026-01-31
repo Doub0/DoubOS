@@ -1,0 +1,55 @@
+[gd_scene load_steps=8 format=3 uid="uid://bxfpoteahjrme"]
+
+[ext_resource type="Script" path="res://scenes/npc.gd" id="1_q57v6"]
+[ext_resource type="SpriteFrames" uid="uid://ch5fvavyqn11m" path="res://scenes/formats/zea_anim.tres" id="2_657u0"]
+[ext_resource type="PackedScene" uid="uid://ietvxfi8i3oq" path="res://dialouge/dialogue.tscn" id="12_1ba2f"]
+[ext_resource type="Texture2D" uid="uid://dvwuvbymovs2" path="res://pixilart-frames/pixil-frame-0 - 2024-02-08T084127.840.png" id="12_55ndj"]
+[ext_resource type="PackedScene" uid="uid://cxxr1pjfbbmjt" path="res://npc_quest.tscn" id="13_5k58a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_22lq6"]
+radius = 5.09902
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4so5j"]
+radius = 33.3333
+
+[node name="npc" type="CharacterBody2D"]
+z_index = -1
+script = ExtResource("1_q57v6")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("2_657u0")
+animation = &"idle"
+
+[node name="Pixil-frame-0-2024-02-08t084127_840" type="Sprite2D" parent="AnimatedSprite2D"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(18, 13)
+texture = ExtResource("12_55ndj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(18.1818, 236.364)
+shape = SubResource("CircleShape2D_22lq6")
+
+[node name="chat_detection_area" type="Area2D" parent="."]
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="chat_detection_area"]
+visible = false
+position = Vector2(-7, -1)
+shape = SubResource("CircleShape2D_4so5j")
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[node name="Dialogue" parent="." instance=ExtResource("12_1ba2f")]
+
+[node name="npc_quest" parent="." instance=ExtResource("13_5k58a")]
+layer = 2
+
+[connection signal="body_entered" from="chat_detection_area" to="." method="_on_chat_detection_area_body_entered"]
+[connection signal="body_exited" from="chat_detection_area" to="." method="_on_chat_detection_area_body_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="dialogue_finished" from="Dialogue" to="." method="_on_dialogue_dialogue_finished"]
+[connection signal="quest_finished" from="npc_quest" to="." method="_on_npc_quest_quest_finished"]
+[connection signal="quest_menu_closed" from="npc_quest" to="." method="_on_npc_quest_quest_menu_closed"]

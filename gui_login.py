@@ -31,7 +31,10 @@ class LoginScreen:
         }
         
         self.logged_in_user = None
+        self.time_callback_id = None  # Track the callback to cancel it later
         self.setup_ui()
+        # Bind destroy event for cleanup
+        self.root.protocol("WM_DELETE_WINDOW", self._on_closing)
         
     def setup_ui(self):
         """Setup login UI"""
@@ -146,11 +149,28 @@ class LoginScreen:
         
     def update_time(self):
         """Update time display"""
-        now = datetime.now()
-        time_str = now.strftime("%I:%M %p")
-        date_str = now.strftime("%A, %B %d, %Y")
-        self.time_label.configure(text=f"{time_str}\n{date_str}")
-        self.root.after(1000, self.update_time)
+        try:
+            # Check if window still exists before doing anything
+            if not self.root.winfo_exists():
+                return
+            
+            now = datetime.now()
+            time_str = now.strftime("%I:%M %p")
+            date_str = now.strftime("%A, %B %d, %Y")
+            self.time_label.configure(text=f"{time_str}\n{date_str}")
+            # Schedule next update
+            self.time_callback_id = self.root.after(1000, self.update_time)
+        except:
+            pass  # Root window was destroyed, stop updating
+    
+    def _on_closing(self):
+        """Cleanup callbacks and close the window"""
+        if self.time_callback_id:
+            try:
+                self.root.after_cancel(self.time_callback_id)
+            except:
+                pass
+        self.root.destroy()
         
     def login(self):
         """Handle login"""
@@ -288,5 +308,18 @@ class LoginScreen:
                 
     def run(self):
         """Run login screen"""
-        self.root.mainloop()
+        try:
+            self.root.mainloop()
+        finally:
+            # Ensure cleanup happens even if mainloop exits abnormally
+            self._on_closing_silent()
         return self.logged_in_user
+    
+    def _on_closing_silent(self):
+        """Silent cleanup without destroying (root may already be destroyed)"""
+        if self.time_callback_id:
+            try:
+                self.root.after_cancel(self.time_callback_id)
+                self.time_callback_id = None
+            except:
+                pass

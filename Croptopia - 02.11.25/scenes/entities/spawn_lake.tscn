@@ -1,0 +1,50 @@
+[gd_scene load_steps=5 format=3 uid="uid://bed5o1ex5rayn"]
+
+[ext_resource type="Texture2D" uid="uid://cun4mnpjy4qsd" path="res://assets/spawn_lake.png" id="1_ty2h1"]
+[ext_resource type="Texture2D" uid="uid://8fcw0o2ex27v" path="res://assets/pixil-frame-0 - 2023-12-19T212454.949.png" id="2_lxtbw"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0ajlq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ty2h1")
+}],
+"loop": true,
+"name": &"still",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xnyl1"]
+size = Vector2(8, 98)
+
+[node name="spawn_lake" type="StaticBody2D"]
+
+[node name="texture" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_0ajlq")
+animation = &"still"
+
+[node name="collision_1" type="CollisionPolygon2D" parent="."]
+visible = false
+position = Vector2(53, 0)
+polygon = PackedVector2Array(-14, -173, -143, -173, -143, -172, -157, -157, -175, -157, -185, -144, -190, -141, -204, -139, -209, -137, -217, -130, -220, -125, -218, -41, -223, -24, -241, -4, -245, 1, -247, 17, -262, 31, -264, 39, -261, 152, -241, 171, -213, 174, -173, 174, -155, 173, -127, 147, -129, 107, -125, 77, -128, 50, -121, 36, -115, 24, -115, 5, -132, -1, -145, -13, -163, -14, -174, -27, -170, -55, -171, -86, -140, -114, -122, -116, -111, -129, -15, -128, -14, -154)
+
+[node name="collision_2" type="CollisionPolygon2D" parent="."]
+visible = false
+position = Vector2(-18, 1)
+polygon = PackedVector2Array(88, -173, 288, -173, 288, -128, 88, -129)
+
+[node name="bridge_entity" type="StaticBody2D" parent="."]
+
+[node name="bridge" type="Sprite2D" parent="bridge_entity"]
+position = Vector2(54, -144)
+texture = ExtResource("2_lxtbw")
+
+[node name="railing_1" type="CollisionShape2D" parent="bridge_entity"]
+visible = false
+position = Vector2(66, -144)
+shape = SubResource("RectangleShape2D_xnyl1")
+
+[node name="railing_2" type="CollisionShape2D" parent="bridge_entity"]
+visible = false
+position = Vector2(42, -144)
+shape = SubResource("RectangleShape2D_xnyl1")

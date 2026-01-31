@@ -163,6 +163,8 @@ class SceneManager(SignalEmitter):
                                                self._on_open_settings)
             self.scenes['main_menu'].on_signal('show_credits',
                                                self._on_show_credits)
+            self.scenes['main_menu'].on_signal('switch_scene',
+                                               self._on_main_menu_switch_scene)
     
     # Signal handlers matching worldtest.gd orchestration
     
@@ -255,6 +257,11 @@ class SceneManager(SignalEmitter):
         print("[SceneManager] → main_menu.show_credits")
         # TODO: Implement credits scene
         print("  [TODO] Credits scene not yet implemented")
+    
+    def _on_main_menu_switch_scene(self, scene_name: str) -> None:
+        """Called when main_menu emits 'switch_scene' with target scene name"""
+        print(f"[SceneManager] → main_menu.switch_scene('{scene_name}')")
+        self.switch_scene(scene_name)
     
     # Scene management methods
     

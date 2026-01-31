@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=3 format=3 uid="uid://c7noxwbyqfprh"]
+
+[ext_resource type="Script" path="res://inventory/inventory_item.gd" id="1_002sx"]
+[ext_resource type="Texture2D" uid="uid://cbwlfmxkoabj2" path="res://assets/Item Assets/placeables/construction_table.png" id="2_kj2ci"]
+
+[resource]
+script = ExtResource("1_002sx")
+name = "Construction Tablee"
+texture = ExtResource("2_kj2ci")

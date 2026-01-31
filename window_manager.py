@@ -144,9 +144,29 @@ class SimulationWindow:
             
     def close(self):
         """Close window"""
-        self.window_frame.destroy()
-        if hasattr(self, 'app') and hasattr(self.app, 'cleanup'):
-            self.app.cleanup()
+        # Call cleanup methods if available
+        if hasattr(self, 'app'):
+            if hasattr(self.app, 'on_destroy'):
+                try:
+                    self.app.on_destroy()
+                except:
+                    pass
+            if hasattr(self.app, 'cleanup'):
+                try:
+                    self.app.cleanup()
+                except:
+                    pass
+            if hasattr(self.app, '_on_destroy'):
+                try:
+                    self.app._on_destroy()
+                except:
+                    pass
+        
+        # Destroy the window frame
+        try:
+            self.window_frame.destroy()
+        except:
+            pass
             
     def focus(self):
         """Bring window to front"""

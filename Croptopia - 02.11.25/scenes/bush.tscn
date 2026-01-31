@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://bh87klt76ogyn"]
+
+[ext_resource type="Texture2D" uid="uid://dtj32tjv542on" path="res://assets/pixil-frame-0 - 2025-06-16T204225.200.png" id="1_mbd5n"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xl8rm"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_mbd5n")
+}],
+"loop": true,
+"name": &"bush",
+"speed": 5.0
+}]
+
+[node name="bush" type="Node2D"]
+
+[node name="anim" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_xl8rm")
+animation = &"bush"
+frame_progress = 0.506942

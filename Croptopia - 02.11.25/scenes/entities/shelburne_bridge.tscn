@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://cuy4dw3frshng"]
+
+[ext_resource type="Texture2D" uid="uid://t3e103wkiby6" path="res://assets/shelburne_bridge.png" id="1_63pvr"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fbuwx"]
+atlas = ExtResource("1_63pvr")
+region = Rect2(25, 20, 80, 51)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3d8aa"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fbuwx")
+}],
+"loop": true,
+"name": &"base",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e56m7"]
+atlas = ExtResource("1_63pvr")
+region = Rect2(25, 71, 80, 19)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ljiuf"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e56m7")
+}],
+"loop": true,
+"name": &"railing",
+"speed": 5.0
+}]
+
+[node name="shelburne_bridge" type="StaticBody2D"]
+
+[node name="base" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3d8aa")
+animation = &"base"
+
+[node name="railing" type="AnimatedSprite2D" parent="."]
+z_index = 1
+position = Vector2(0, 8)
+sprite_frames = SubResource("SpriteFrames_ljiuf")
+animation = &"railing"

@@ -1,0 +1,69 @@
+[gd_scene load_steps=7 format=3 uid="uid://gfvw23opwuda"]
+
+[ext_resource type="Script" path="res://inventory/ore_depot.gd" id="1_a80ll"]
+[ext_resource type="Texture2D" uid="uid://23uo0t0lm0dn" path="res://assets/ore_depot_coal.png" id="1_i6c7w"]
+[ext_resource type="Texture2D" uid="uid://bgntsqm8vfna4" path="res://assets/ore_depot_iron_ore.png" id="2_o5g5w"]
+[ext_resource type="Texture2D" uid="uid://cgru2auhgd85" path="res://assets/ore_depot_no_ore.png" id="3_fbagd"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u8vk3"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_i6c7w")
+}],
+"loop": true,
+"name": &"coal_ore",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_o5g5w")
+}],
+"loop": true,
+"name": &"iron_ore",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_fbagd")
+}],
+"loop": true,
+"name": &"no_ores",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_rk056"]
+radius = 34.2345
+
+[node name="ore_depot" type="Node2D"]
+script = ExtResource("1_a80ll")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
+sprite_frames = SubResource("SpriteFrames_u8vk3")
+animation = &"coal_ore"
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="Area2D" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_rk056")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.439216)
+position = Vector2(4.76837e-07, 3.5)
+scale = Vector2(1.20833, 0.90625)
+texture = ExtResource("3_fbagd")
+
+[node name="shadow" type="PointLight2D" parent="Sprite2D"]
+color = Color(0, 0, 0, 1)
+blend_mode = 2
+range_z_min = 0
+range_z_max = 0
+shadow_color = Color(0, 0, 0, 1)
+shadow_filter_smooth = 62.7
+texture = ExtResource("3_fbagd")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

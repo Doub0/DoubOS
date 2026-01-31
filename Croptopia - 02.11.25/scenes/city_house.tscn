@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=3 uid="uid://ckp2u7oqsbgtj"]
+
+[ext_resource type="Script" path="res://scenes/city_house.gd" id="1_qtcfa"]
+[ext_resource type="Texture2D" uid="uid://blmn1mvejewik" path="res://assets/buildings_1.png" id="2_ek6ya"]
+[ext_resource type="Texture2D" uid="uid://ck5byb3ddb2jv" path="res://assets/mayor_house.png" id="3_33447"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nnn7a"]
+atlas = ExtResource("2_ek6ya")
+region = Rect2(6005, 50, 185, 150)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4temt"]
+atlas = ExtResource("2_ek6ya")
+region = Rect2(0, 110, 90, 90)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_3unsh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nnn7a")
+}],
+"loop": true,
+"name": &"house_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4temt")
+}],
+"loop": true,
+"name": &"house_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_33447")
+}],
+"loop": true,
+"name": &"mayor_house",
+"speed": 5.0
+}]
+
+[node name="city_houses" type="Node2D"]
+scale = Vector2(1.505, 1.505)
+script = ExtResource("1_qtcfa")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_3unsh")
+animation = &"mayor_house"

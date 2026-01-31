@@ -152,6 +152,15 @@ class GameEngine:
     def _update_systems(self) -> None:
         """Update all game systems"""
         
+        current_scene = self.scene_manager.get_active_scene()
+        menu_scenes = ['main_menu', 'settings', 'credits']
+        
+        # For menu scenes, only update the scene
+        if current_scene and current_scene.name in menu_scenes:
+            current_scene.update(self.delta)
+            return
+        
+        # For gameplay scenes, update all systems
         # Update player
         self.player.update(self.delta)
         
@@ -163,7 +172,6 @@ class GameEngine:
         self.ui.update(self.delta)
         
         # Update scene
-        current_scene = self.scene_manager.get_active_scene()
         if current_scene:
             current_scene.update(self.delta)
     
@@ -171,8 +179,22 @@ class GameEngine:
         """
         Render all systems in order.
         Implements proper layer ordering.
+        
+        Special handling for menu scenes (main_menu, settings, credits)
+        which should NOT render the game world.
         """
         
+        current_scene = self.scene_manager.get_active_scene()
+        
+        # For menu scenes, only render the scene itself
+        menu_scenes = ['main_menu', 'settings', 'credits']
+        if current_scene and current_scene.name in menu_scenes:
+            # Clear and render only the menu scene
+            self.display.fill((0, 0, 0))  # Black background
+            current_scene.render(self.display)
+            return
+        
+        # For gameplay scenes, render full world
         # Clear display with grass green
         self.display.fill((100, 150, 80))  # Grass green background
         
@@ -186,12 +208,12 @@ class GameEngine:
         self.player.render(self.display, self.player.camera_offset)
         
         # Render current scene on top (for cutscenes, etc.)
-        current_scene = self.scene_manager.get_active_scene()
         if current_scene:
             current_scene.render(self.display)
         
-        # Render UI canvas last (on top of everything)
-        self.ui.render(self.display)
+        # Render UI canvas last (on top of everything) - but NOT on menu scenes
+        if not (current_scene and current_scene.name in menu_scenes):
+            self.ui.render(self.display)
         
         # Debug rendering
         if self.debug_show_collision:

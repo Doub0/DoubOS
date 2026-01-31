@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3 uid="uid://bhpfmyujudrv0"]
+
+[ext_resource type="Script" path="res://scenes/worldtest.gd" id="1_t7q4g"]
+[ext_resource type="PackedScene" uid="uid://0rel4xeb7kk6" path="res://scenes/player.tscn" id="5_f2y4b"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_t7q4g")
+metadata/_edit_horizontal_guides_ = [-1545.0]
+
+[node name="player" parent="." instance=ExtResource("5_f2y4b")]
+position = Vector2(12, -11)
+
+[node name="sandbox_post_cutscene" type="Marker2D" parent="."]
+position = Vector2(-4642, -4830)
+
+[node name="michael_plot_pos" type="Marker2D" parent="."]
+position = Vector2(-4715, -4903)
+
+[node name="top_of_mt_crag_pos" type="Marker2D" parent="."]
+position = Vector2(-5870, -18615)
+
+[node name="shelburne_road_pos" type="Marker2D" parent="."]
+position = Vector2(186, -1016)
+
+[node name="spawn_pos" type="Marker2D" parent="."]
+position = Vector2(128, 21)
+
+[node name="shelburne_pos" type="Marker2D" parent="."]
+position = Vector2(-17818, -8305)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 23.0
+scale = Vector2(0.68, 0.68)
+
+[connection signal="redbane_selected" from="player" to="." method="_on_player_redbane_selected"]
+[connection signal="world_disable_building" from="player" to="." method="_on_player_world_disable_building"]

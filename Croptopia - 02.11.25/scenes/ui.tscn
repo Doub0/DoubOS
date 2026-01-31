@@ -1,0 +1,222 @@
+[gd_scene load_steps=14 format=3 uid="uid://dl4vsbvlmqmj7"]
+
+[ext_resource type="Script" path="res://scenes/ui.gd" id="1_3b3hq"]
+[ext_resource type="PackedScene" uid="uid://ctajy8bx2f4fk" path="res://inv_improved_ui.tscn" id="1_okuyh"]
+[ext_resource type="PackedScene" uid="uid://1mtdl2ud1ff5" path="res://pause_menu.tscn" id="2_65bnm"]
+[ext_resource type="PackedScene" uid="uid://bji8runx74yue" path="res://hotbar.tscn" id="3_gfir7"]
+[ext_resource type="Texture2D" uid="uid://lib1ka7kbux0" path="res://assets/death.png" id="4_2unyb"]
+[ext_resource type="PackedScene" uid="uid://b5runrwq4lnet" path="res://day_and_night.tscn" id="6_4aykn"]
+[ext_resource type="Texture2D" uid="uid://cfu2fnyqax450" path="res://assets/pixil-frame-0 (5).png" id="6_pp5gf"]
+[ext_resource type="Texture2D" uid="uid://dnrk2ummmg334" path="res://assets/ui_bar.png" id="7_j3q62"]
+[ext_resource type="FontFile" uid="uid://uynswcck0os1" path="res://fonts/pixelated.ttf" id="8_mqf4w"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tqxlo"]
+texture = ExtResource("7_j3q62")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fb43o"]
+bg_color = Color(0.733333, 0.560784, 0.407843, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.231373, 0.113725, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+anti_aliasing = false
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_stmhx"]
+texture = ExtResource("7_j3q62")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u77ac"]
+bg_color = Color(0.733333, 0.560784, 0.407843, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.231373, 0.113725, 0, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 1
+anti_aliasing = false
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_3b3hq")
+
+[node name="Inventory" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+scale = Vector2(3, 3)
+transform = Transform2D(3, 0, 0, 3, 0, 0)
+
+[node name="Crafting_menu" parent="Inventory" instance=ExtResource("1_okuyh")]
+visible = false
+offset_left = -1129.33
+offset_top = -1116.0
+offset_right = -1089.33
+offset_bottom = -1076.0
+
+[node name="Pause_Menu" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="pause_menu" parent="Pause_Menu" instance=ExtResource("2_65bnm")]
+
+[node name="hotbar_holder" type="CanvasLayer" parent="."]
+
+[node name="hotbar" parent="hotbar_holder" instance=ExtResource("3_gfir7")]
+offset_left = 239.0
+offset_top = 544.0
+offset_right = 239.0
+offset_bottom = 544.0
+scale = Vector2(3, 3)
+metadata/_edit_use_anchors_ = true
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+follow_viewport_scale = 0.3
+
+[node name="death_screen" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Sprite2D" type="Sprite2D" parent="CanvasLayer/death_screen"]
+position = Vector2(575, 329)
+scale = Vector2(0.915, 0.915)
+texture = ExtResource("4_2unyb")
+
+[node name="day_and_night" type="CanvasLayer" parent="."]
+layer = 0
+scale = Vector2(3, 3)
+transform = Transform2D(3, 0, 0, 3, 0, 0)
+
+[node name="day-and-night" parent="day_and_night" instance=ExtResource("6_4aykn")]
+offset_left = 9.0
+offset_top = -1.0
+offset_right = 49.0
+offset_bottom = 39.0
+
+[node name="money_count" type="CanvasLayer" parent="."]
+
+[node name="Panel" type="Panel" parent="money_count"]
+offset_left = 1090.0
+offset_top = 40.0
+offset_right = 1130.0
+offset_bottom = 80.0
+
+[node name="Sprite2D" type="Sprite2D" parent="money_count/Panel"]
+position = Vector2(19, 19)
+scale = Vector2(2.5, 2.5)
+texture = ExtResource("6_pp5gf")
+
+[node name="count" type="Label" parent="money_count/Panel/Sprite2D"]
+offset_left = -10.4
+offset_top = -14.4
+offset_right = 28.6
+offset_bottom = 11.6
+text = "0"
+
+[node name="dollars" type="Label" parent="money_count/Panel/Sprite2D"]
+offset_left = 0.799988
+offset_top = -14.4
+offset_right = 40.8
+offset_bottom = 11.6
+text = "$"
+
+[node name="stat_bars" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="health_bar" type="Control" parent="stat_bars"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 11.0
+offset_top = 479.0
+offset_right = 51.0
+offset_bottom = 519.0
+
+[node name="health_frame" type="Panel" parent="stat_bars/health_bar"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 82.0
+offset_right = 215.0
+offset_bottom = 96.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_tqxlo")
+
+[node name="bar_title" type="Panel" parent="stat_bars/health_bar/health_frame"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 14.0
+offset_right = 135.0
+offset_bottom = 26.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_fb43o")
+
+[node name="hp_title" type="Label" parent="stat_bars/health_bar/health_frame/bar_title"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = -9.0
+offset_right = 60.0
+offset_bottom = 14.0
+scale = Vector2(1.5, 1.5)
+theme_override_colors/font_color = Color(0, 0.894118, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_mqf4w")
+text = "HP +"
+
+[node name="health_level" type="ColorRect" parent="stat_bars/health_bar"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 87.0
+offset_right = 206.0
+offset_bottom = 91.0
+color = Color(0, 1, 0, 1)
+
+[node name="drps_bar" type="Control" parent="stat_bars"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 27.0
+offset_top = 552.0
+offset_right = 67.0
+offset_bottom = 592.0
+
+[node name="drps_frame" type="Panel" parent="stat_bars/drps_bar"]
+layout_mode = 0
+offset_left = -13.0
+offset_top = 46.0
+offset_right = 198.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxTexture_stmhx")
+
+[node name="bar_title" type="Panel" parent="stat_bars/drps_bar/drps_frame"]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 14.0
+offset_right = 134.0
+offset_bottom = 26.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_u77ac")
+
+[node name="hp_title" type="Label" parent="stat_bars/drps_bar/drps_frame/bar_title"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = -4.0
+offset_right = 48.0
+offset_bottom = 19.0
+scale = Vector2(1.5, 1.5)
+theme_override_colors/font_color = Color(0.615686, 0.321569, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("8_mqf4w")
+text = "DRPS"
+
+[node name="health_level" type="ColorRect" parent="stat_bars/drps_bar"]
+layout_mode = 0
+offset_left = -6.0
+offset_top = 51.0
+offset_right = 190.0
+offset_bottom = 55.0
+color = Color(0.611765, 0.537255, 1, 1)

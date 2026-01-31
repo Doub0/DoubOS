@@ -1,0 +1,218 @@
+[gd_scene load_steps=25 format=3 uid="uid://bcqxwj1q0uq08"]
+
+[ext_resource type="Script" path="res://npc.gd" id="1_lmmal"]
+[ext_resource type="Texture2D" uid="uid://ch6qo3bgwfxei" path="res://assets/police_officer_sprite.png" id="2_ia5s6"]
+[ext_resource type="Texture2D" uid="uid://dvwuvbymovs2" path="res://pixilart-frames/pixil-frame-0 - 2024-02-08T084127.840.png" id="3_vaa3k"]
+[ext_resource type="Texture2D" uid="uid://bc6ictjmkdwbo" path="res://assets/character_pieces_1.png" id="4_eq3ur"]
+[ext_resource type="Texture2D" uid="uid://cjlskl356aj3q" path="res://assets/federal_helmet.png" id="5_2jup5"]
+[ext_resource type="Texture2D" uid="uid://c0ys0a6x172jq" path="res://assets/federal_soldier.png" id="6_01eii"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gupct"]
+atlas = ExtResource("2_ia5s6")
+region = Rect2(176, 0, 16, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1kdfd"]
+atlas = ExtResource("2_ia5s6")
+region = Rect2(128, 0, 16, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sevmu"]
+atlas = ExtResource("2_ia5s6")
+region = Rect2(80, 0, 16, 36)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wa5tw"]
+atlas = ExtResource("2_ia5s6")
+region = Rect2(0, 0, 16, 36)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_68yms"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gupct")
+}],
+"loop": true,
+"name": &"cop_check",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1kdfd")
+}],
+"loop": true,
+"name": &"cop_e",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"cop_idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sevmu")
+}],
+"loop": true,
+"name": &"cop_n",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wa5tw")
+}],
+"loop": true,
+"name": &"cop_s",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_22lq6"]
+radius = 5.09902
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4so5j"]
+radius = 33.3333
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_anhhb"]
+atlas = ExtResource("4_eq3ur")
+region = Rect2(40, 0, 10, 10)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pcutj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_anhhb")
+}],
+"loop": true,
+"name": &"face",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2plc6"]
+atlas = ExtResource("4_eq3ur")
+region = Rect2(110, 0, 10, 10)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2ctt8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2plc6")
+}],
+"loop": true,
+"name": &"green_eyes",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ppjkm"]
+atlas = ExtResource("4_eq3ur")
+region = Rect2(180, 0, 10, 10)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sckh7"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ppjkm")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pjwj4"]
+atlas = ExtResource("5_2jup5")
+region = Rect2(0, 0, 15, 13)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gkhvp"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pjwj4")
+}],
+"loop": true,
+"name": &"fed_helmet_s",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wb23a"]
+atlas = ExtResource("6_01eii")
+region = Rect2(0, 0, 31, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mgmiv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wb23a")
+}],
+"loop": true,
+"name": &"fed_uniform_s",
+"speed": 5.0
+}]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0xcga"]
+
+[node name="npc_format" type="CharacterBody2D"]
+z_index = 3
+script = ExtResource("1_lmmal")
+
+[node name="body" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_68yms")
+animation = &"cop_e"
+
+[node name="Pixil-frame-0-2024-02-08t084127_840" type="Sprite2D" parent="body"]
+modulate = Color(0, 0, 0, 0.521569)
+show_behind_parent = true
+position = Vector2(10, 14)
+scale = Vector2(0.685, 0.685)
+texture = ExtResource("3_vaa3k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(-1, 14)
+shape = SubResource("CircleShape2D_22lq6")
+
+[node name="chat_detection_area" type="Area2D" parent="."]
+scale = Vector2(0.6, 0.6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="chat_detection_area"]
+visible = false
+position = Vector2(-1.66667, 23.3333)
+shape = SubResource("CircleShape2D_4so5j")
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[node name="face" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, -5)
+scale = Vector2(0.745, 0.745)
+sprite_frames = SubResource("SpriteFrames_pcutj")
+animation = &"face"
+
+[node name="eyes" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0.025, -3.485)
+sprite_frames = SubResource("SpriteFrames_2ctt8")
+animation = &"green_eyes"
+
+[node name="mouth" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0.025, -4)
+scale = Vector2(0.705, 0.705)
+sprite_frames = SubResource("SpriteFrames_sckh7")
+
+[node name="hat" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(-0.142045, -7.8125)
+sprite_frames = SubResource("SpriteFrames_gkhvp")
+animation = &"fed_helmet_s"
+
+[node name="torso" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(0, 1.09091)
+scale = Vector2(1, 1.06818)
+sprite_frames = SubResource("SpriteFrames_mgmiv")
+animation = &"fed_uniform_s"
+
+[node name="pants" type="AnimatedSprite2D" parent="."]
+visible = false
+sprite_frames = SubResource("SpriteFrames_0xcga")
+
+[connection signal="body_entered" from="chat_detection_area" to="." method="_on_chat_detection_area_body_entered" flags=18]
+[connection signal="body_exited" from="chat_detection_area" to="." method="_on_chat_detection_area_body_exited" flags=18]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout" flags=18]

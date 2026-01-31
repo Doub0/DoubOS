@@ -782,6 +782,7 @@ class SystemMonitorApp(BaseWindow):
     def __init__(self, desktop, kernel):
         super().__init__(desktop, "System Monitor", 600, 400, "📊")
         self.kernel = kernel
+        self.callback_id = None  # Track callback for cleanup
         self.setup_ui()
         self.update_stats()
         
@@ -792,9 +793,24 @@ class SystemMonitorApp(BaseWindow):
                                     justify=tk.LEFT)
         self.stats_label.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
+        # Bind destroy event to cleanup callback
+        self.window.bind('<Destroy>', self._on_destroy)
+        
+    def _on_destroy(self, event=None):
+        """Clean up callbacks when window closes"""
+        if self.callback_id:
+            try:
+                self.window.after_cancel(self.callback_id)
+            except:
+                pass
+        
     def update_stats(self):
         """Update system stats"""
-        stats = f"""DoubOS System Monitor
+        try:
+            if not self.window.winfo_exists():
+                return  # Window was destroyed
+            
+            stats = f"""DoubOS System Monitor
 
 Uptime: {self.kernel.get_uptime()}
 Version: {self.kernel.version}
@@ -808,8 +824,10 @@ Environment Variables: {len(self.kernel.environment_vars)}
 
 Status: ✅ All systems operational
 """
-        self.stats_label.configure(text=stats)
-        self.window.after(1000, self.update_stats)
+            self.stats_label.configure(text=stats)
+            self.callback_id = self.window.after(1000, self.update_stats)
+        except:
+            pass  # Silently fail if widget is destroyed
 
 
 class BrowserApp(BaseWindow):

@@ -1,0 +1,82 @@
+[gd_scene load_steps=11 format=3 uid="uid://tg1qtgs3mm8k"]
+
+[ext_resource type="Texture2D" uid="uid://bva8jeg1s2a8g" path="res://pixil-frame-0 - 2023-12-12T114516.200.png" id="1_igpgh"]
+[ext_resource type="Script" path="res://scenes/shrubs.gd" id="1_peagg"]
+[ext_resource type="Texture2D" uid="uid://bfklrmgiwj3us" path="res://assets/pixil-frame-0 (45).png" id="2_4hikv"]
+[ext_resource type="Texture2D" uid="uid://ckycmt7uxtugq" path="res://scenes/pixil-frame-0 (83).png" id="3_rsegl"]
+[ext_resource type="Texture2D" uid="uid://bhj7yya2fws2" path="res://scenes/pixil-frame-0 (86).png" id="4_wnfc3"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3kt5v"]
+atlas = ExtResource("3_rsegl")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r4dnr"]
+atlas = ExtResource("2_4hikv")
+region = Rect2(48, 176, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3sqbj"]
+atlas = ExtResource("2_4hikv")
+region = Rect2(63, 144, 17, 18)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_r412s"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_igpgh")
+}],
+"loop": true,
+"name": &"acorn",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3kt5v")
+}],
+"loop": true,
+"name": &"flower_1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_wnfc3")
+}],
+"loop": true,
+"name": &"flower_bundle_1",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"flower_bundle_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r4dnr")
+}],
+"loop": true,
+"name": &"grass",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3sqbj")
+}],
+"loop": true,
+"name": &"stub",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b7r53"]
+radius = 2.0
+
+[node name="shrubs" type="StaticBody2D"]
+script = ExtResource("1_peagg")
+
+[node name="anim" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_r412s")
+animation = &"flower_1"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2(-1, 4)
+shape = SubResource("CircleShape2D_b7r53")
