@@ -54,6 +54,7 @@ class SceneManager(SignalEmitter):
         
         # Import all real scene classes
         from croptopia.scenes.main_menu_scene import MainMenuScene
+        from croptopia.scenes.worldtest_scene import WorldTestScene
         from croptopia.scenes.spawn_node_scene import SpawnNodeScene
         from croptopia.scenes.shelburne_road_scene import ShelburneRoadScene
         from croptopia.scenes.shelburne_scene import ShelburneScene
@@ -63,6 +64,7 @@ class SceneManager(SignalEmitter):
         
         scenes_to_load = {
             'main_menu': MainMenuScene,
+            'worldtest': WorldTestScene,
             'spawn_node': SpawnNodeScene,
             'shelburne_road': ShelburneRoadScene,
             'shelburne': ShelburneScene,

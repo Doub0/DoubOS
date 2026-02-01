@@ -142,21 +142,26 @@ class GameEngine:
                 # ESC to quit
                 elif event.key == pygame.K_ESCAPE:
                     self.running = False
+                
+                # Number keys (1-8) for hotbar selection
+                elif pygame.K_1 <= event.key <= pygame.K_8:
+                    slot = event.key - pygame.K_1
+                    self.ui.hotbar.select_slot(slot)
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 # Handle UI clicks
                 mouse_pos = pygame.mouse.get_pos()
                 self.ui.handle_mouse_click(mouse_pos)
-    
-    def quit(self):
-        """Quit the game"""
-        print("[Engine] Quit requested")
-        self.running = False
         
         # Continuous key input for movement
         keys = pygame.key.get_pressed()
         mouse_buttons = pygame.mouse.get_pressed()
         self.player.handle_input(keys, mouse_buttons)
+    
+    def quit(self):
+        """Quit the game"""
+        print("[Engine] Quit requested")
+        self.running = False
     
     def _update_systems(self) -> None:
         """Update all game systems"""
@@ -213,14 +218,14 @@ class GameEngine:
         # Render entities (shrubs, collectables, etc.) - between tilemap and player
         self.entity_manager.render(self.display, self.player.camera_offset)
         
-        # Render player on top
+        # Render player on top using the actual player render method
         self.player.render(self.display, self.player.camera_offset)
         
         # Render current scene on top (for cutscenes, etc.)
         if current_scene:
             current_scene.render(self.display)
         
-        # Render UI canvas last (on top of everything) - but NOT on menu scenes
+        # Render UI canvas last (on top of everything)
         if not (current_scene and current_scene.name in menu_scenes):
             self.ui.render(self.display)
         

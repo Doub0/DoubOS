@@ -434,35 +434,9 @@ class HUD:
         if not self.visible:
             return
         
-        # Draw HUD background
-        hud_rect = pygame.Rect(0, 0, display.get_width(), self.HUD_HEIGHT)
-        if self.ui_bar_surface:
-            bar = pygame.transform.scale(self.ui_bar_surface, (display.get_width(), self.HUD_HEIGHT))
-            display.blit(bar, (0, 0))
-        else:
-            pygame.draw.rect(display, (30, 30, 30), hud_rect)
-            pygame.draw.line(display, (100, 100, 100), 
-                            (0, self.HUD_HEIGHT), 
-                            (display.get_width(), self.HUD_HEIGHT), 2)
-
-        # Draw text info
-        font = pygame.font.Font(self.font_path, 18) if self.font_path else pygame.font.Font(None, 24)
-        
-        day_text = font.render(f"Day {self.day}", True, (200, 200, 200))
-        display.blit(day_text, (10, 10))
-
-        money_x = 120
-        if self.money_icon_surface:
-            icon = pygame.transform.scale(self.money_icon_surface, (20, 20))
-            display.blit(icon, (90, 10))
-            money_x = 115
-
-        money_text = font.render(f"${self.money}", True, (200, 200, 100))
-        display.blit(money_text, (money_x, 10))
-
-        health_text = font.render(f"HP: {self.health}/{self.max_health}", True, 
-                                 (200, 100, 100))
-        display.blit(health_text, (display.get_width() - 170, 10))
+        # Don't render anything - let the day_night_panel and money_panel handle it
+        # The HUD class is deprecated in favor of individual panels
+        pass
     
     def set_day(self, day: int) -> None:
         """Set current day"""

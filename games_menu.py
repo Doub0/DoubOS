@@ -69,10 +69,21 @@ class GamesMenuApp(tk.Frame):
     def launch_croptopia(self):
         """Launch current Croptopia build (croptopia_python)"""
         try:
-            repo_root = os.getcwd()
-            venv_python = os.path.join(repo_root, ".venv", "Scripts", "python.exe")
+            # Get the correct DoubOS directory (where this script is located)
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            croptopia_dir = os.path.join(script_dir, "croptopia_python")
+            main_py = os.path.join(croptopia_dir, "main.py")
+            
+            # Check if the game exists
+            if not os.path.exists(main_py):
+                raise FileNotFoundError(f"Game not found at: {main_py}")
+            
+            # Find Python executable
+            venv_python = os.path.join(script_dir, ".venv", "Scripts", "python.exe")
             python_exe = venv_python if os.path.exists(venv_python) else sys.executable
-            subprocess.Popen([python_exe, "main.py"], cwd=os.path.join(repo_root, "croptopia_python"))
-        except Exception:
+            
+            # Launch the game
+            subprocess.Popen([python_exe, "main.py"], cwd=croptopia_dir)
+        except Exception as e:
             import tkinter.messagebox as mb
-            mb.showerror("Croptopia", "Failed to launch Croptopia")
+            mb.showerror("Croptopia", f"Failed to launch Croptopia:\n{str(e)}")

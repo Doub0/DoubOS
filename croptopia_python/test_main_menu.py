@@ -19,7 +19,11 @@ class MockEngine:
     def __init__(self):
         self.player = MockPlayer()
         self.running = True
-        self.display = None
+        pygame.init()
+        self.display = pygame.display.set_mode((1152, 648))
+        # Add croptopia_root path
+        import os
+        self.croptopia_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class MockPlayer:

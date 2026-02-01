@@ -71,9 +71,9 @@ class Player(SignalEmitter):
         self.item_type = None      # Category of item
         self.item_position = pygame.math.Vector2(0, 0)
         
-        # Camera system
+        # Camera system (1152x648 from Godot worldtest)
         self.camera_enabled = True
-        self.screen_center = pygame.math.Vector2(400, 300)  # Half of 800x600
+        self.screen_center = pygame.math.Vector2(576, 324)  # Half of 1152x648
         self.camera_offset = pygame.math.Vector2(position) - self.screen_center
         
         # Signals emitted from player (from player.gd)
@@ -213,23 +213,31 @@ class Player(SignalEmitter):
         screen_x = self.position.x - camera_pos.x
         screen_y = self.position.y - camera_pos.y
         
-        # Only draw if on screen
-        if -64 < screen_x < display.get_width() + 64 and \
-           -64 < screen_y < display.get_height() + 64:
-            
-            # Draw player sprite
-            sprite_key = self._get_sprite_key()
-            if sprite_key in self.assets:
-                sprite = self.assets[sprite_key]
-                display.blit(sprite, (screen_x, screen_y))
-            else:
-                # Draw placeholder circle if sprite not loaded
-                pygame.draw.circle(display, (100, 200, 100), 
-                                 (int(screen_x) + 8, int(screen_y) + 8), 8)
-            
-            # Draw item if holding
-            if self.item_type:
-                self._render_item(display, screen_x, screen_y)
+        # Get sprite key
+        sprite_key = self._get_sprite_key()
+        
+        # Debug output every 60 frames
+        if not hasattr(self, '_debug_counter'):
+            self._debug_counter = 0
+        self._debug_counter += 1
+        if self._debug_counter == 60:
+            print(f"[Player] Pos:({self.position.x:.0f},{self.position.y:.0f}) Cam:({camera_pos.x:.0f},{camera_pos.y:.0f}) Screen:({screen_x:.0f},{screen_y:.0f}) Key:{sprite_key} InAssets:{sprite_key in self.assets}")
+            self._debug_counter = 0
+        
+        # Draw player sprite - NO PLACEHOLDERS
+        if sprite_key in self.assets:
+            sprite = self.assets[sprite_key]
+            # Center the sprite (sprites are 16x16 pixels)
+            display.blit(sprite, (int(screen_x - 8), int(screen_y - 8)))
+        else:
+            # Debug: print what we're looking for
+            if self.is_moving:
+                print(f"[Player] Missing sprite: {sprite_key}")
+                print(f"[Player] Available keys: {list(self.assets.keys())[:5]}...")
+        
+        # Draw item if holding
+        if self.item_type:
+            self._render_item(display, screen_x, screen_y)
     
     def _get_direction_from_input(self, input_x: int, input_y: int) -> Direction:
         """

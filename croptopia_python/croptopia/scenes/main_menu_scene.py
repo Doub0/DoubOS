@@ -47,23 +47,23 @@ class MainMenuScene(Scene):
         self.modulate_color = (1.0, 1.0, 1.0)
         
         # Button positions from Camera2D transform of main.tscn coordinates
-        # Camera at (13, -2) with zoom (0.6, 0.545)
+        # Camera at (13, -2) with zoom (0.6, 0.545), screen center (576, 324)
         # World coords -> Screen coords: screen = (world - cam) * zoom + center
-        # Buttons need to stay on screen (X >= 0), so offset positive
-        # play: world(-985, 304) -> screen(-22, 490) -> offset to (0, 490)
-        # settings: world(-551, 305) -> screen(237, 491) -> (237, 491)
-        # exit: world(-35, 206) -> screen(547, 437) -> (547, 437)
+        # Keep exact transformed positions (even if negative X for proper spacing)
+        # play: world(-985, 304) -> screen(-23, 491), size(287, 205)
+        # settings: world(-551, 305) -> screen(238, 491), size(372, 204)
+        # exit: world(-35, 206) -> screen(547, 437), size(672, 363) [100x60 icon * 6.722x6.048]
         self.buttons = {
             'play': {
-                'rect': pygame.Rect(0, 490, 287, 205),
+                'rect': pygame.Rect(-23, 491, 287, 205),
                 'icon': None,
             },
             'settings': {
-                'rect': pygame.Rect(237, 491, 372, 204),
+                'rect': pygame.Rect(238, 491, 372, 204),
                 'icon': None,
             },
             'exit': {
-                'rect': pygame.Rect(547, 437, 577, 224),
+                'rect': pygame.Rect(547, 437, 445, 185),
                 'icon': None,
             },
             'credits': {
@@ -74,12 +74,19 @@ class MainMenuScene(Scene):
         
         # Text elements (positions derived from main.tscn, then rendered simply)
         self.label_text = "A game by DoubO"
-        self.label_font_size = max(12, int(26 * 5.30584 * self.camera_zoom.y))
-        self.label_pos = (900, 580)  # Lower right area, away from buttons
+        # Label in main.tscn: size(139, 26), pos(506, 459), scale(3.203, 5.306)
+        # Screen pos: (506-13)*0.6+576=871.8, (459-(-2))*0.545+324=575.2
+        # BOTTOM RIGHT corner of screen
+        self.label_pos = (872, 575)
+        self.label_base_font_size = 16  # Small base size
+        self.label_scale = (3.203, 5.306)  # Scale up for pixelated effect
+        # Use default font - pixelation comes from aggressive scaling
+        self.label_font = pygame.font.Font(None, self.label_base_font_size)
         self.croptopia_text = "CROPTOPIA\nDEMO"
-        # Demo sprite world pos (343, 339) -> screen via camera transform
-        demo_screen = self._world_to_screen((343, 339))
-        self.croptopia_pos = demo_screen  # Will be used as topleft for blitting
+        # Demo sprite (Sprite2D) world pos (343, 339), scale (6.04, 3.935)
+        # Screen pos: (343-13)*0.6+576=774, (339-(-2))*0.545+324=509.8
+        # Sprite2D uses center anchor in Godot, so use center for blitting
+        self.croptopia_pos = (774, 510)  # Calculated screen center position
         self._menu_screenshot_saved = False
         self._menu_screenshot_path = os.path.abspath(
             os.path.join(self.engine.croptopia_root, "..", "screenshot_menu_surface.png")
@@ -111,26 +118,26 @@ class MainMenuScene(Scene):
                 self.titlescreen, 
                 (self.engine.display.get_width(), self.engine.display.get_height())
             )
-            print(f"[MainMenuScene] ✓ Loaded Titlescreen.png")
+            print(f"[MainMenuScene] [OK] Loaded Titlescreen.png")
         
         # Load button icons - reference pixel-perfect sizes
         play_path = os.path.join(buttons_dir, "sr25704223c58aws3.png")
         if os.path.exists(play_path):
             self.play_button_icon = pygame.image.load(play_path)
             self.play_button_icon = pygame.transform.scale(self.play_button_icon, (287, 205))
-            print(f"[MainMenuScene] ✓ Loaded play button icon (287x205)")
+            print(f"[MainMenuScene] [OK] Loaded play button icon (287x205)")
         
         settings_path = os.path.join(buttons_dir, "sr257fe7dae1daws3.png")
         if os.path.exists(settings_path):
             self.settings_button_icon = pygame.image.load(settings_path)
             self.settings_button_icon = pygame.transform.scale(self.settings_button_icon, (372, 204))
-            print(f"[MainMenuScene] ✓ Loaded settings button icon (372x204)")
+            print(f"[MainMenuScene] [OK] Loaded settings button icon (372x204)")
         
         exit_path = os.path.join(pixilart_dir, "c7e7eeb647608e2.png")
         if os.path.exists(exit_path):
             self.exit_button_icon = pygame.image.load(exit_path)
             self.exit_button_icon = pygame.transform.scale(self.exit_button_icon, (577, 224))
-            print(f"[MainMenuScene] ✓ Loaded exit button icon (577x224)")
+            print(f"[MainMenuScene] [OK] Loaded exit button icon (577x224)")
         
         # Load decoration sprite (CROPTOPIA DEMO art)
         deco_path = os.path.join(scenes_dir, "pixil-frame-0 - 2024-02-22T210355.395.png")
@@ -143,14 +150,14 @@ class MainMenuScene(Scene):
                 max(1, int(deco_img.get_height() * scale_y)),
             )
             self.decoration_sprite = pygame.transform.scale(deco_img, target_size)
-            print(f"[MainMenuScene] ✓ Loaded decoration sprite ({target_size[0]}x{target_size[1]})")
+            print(f"[MainMenuScene] [OK] Loaded decoration sprite ({target_size[0]}x{target_size[1]})")
         
         # Load splash texture
         splash_path = os.path.join(self.engine.croptopia_root, "pixil-frame-0 - 2024-02-26T083114.993.png")
         if os.path.exists(splash_path):
             self.splash_texture = pygame.image.load(splash_path)
             self.splash_texture = pygame.transform.scale(self.splash_texture, (100, 100))
-            print(f"[MainMenuScene] ✓ Loaded splash texture")
+            print(f"[MainMenuScene] [OK] Loaded splash texture")
 
     def enter(self):
         """Called when scene becomes active"""
@@ -170,7 +177,7 @@ class MainMenuScene(Scene):
                     pygame.mixer.music.set_volume(0.7)
                     pygame.mixer.music.play(-1)
                     self.music_playing = True
-                    print("[MainMenuScene] ♪ Main_menu_.wav playing")
+                    print("[MainMenuScene] [MUSIC] Main_menu_.wav playing")
             except Exception as e:
                 print(f"[MainMenuScene] Audio error: {e}")
 
@@ -181,7 +188,7 @@ class MainMenuScene(Scene):
             if self.splash_timer >= 2.5:
                 self.show_splash = False
                 self.menu_active = True
-                print("[MainMenuScene] ► Timer2 timeout - menu now active")
+                print("[MainMenuScene] [TIMER] Timer2 timeout - menu now active")
         
         # Handle button clicks
         if self.menu_active and pygame.mouse.get_pressed()[0]:
@@ -194,7 +201,7 @@ class MainMenuScene(Scene):
         """Handle button click"""
         if button_name == 'play':
             print("[MainMenuScene] PLAY BUTTON")
-            self.engine.scene_manager.switch_scene('spawn_node')
+            self.engine.scene_manager.switch_scene('worldtest')
         elif button_name == 'settings':
             print("[MainMenuScene] SETTINGS BUTTON")
         elif button_name == 'exit':
@@ -290,14 +297,18 @@ class MainMenuScene(Scene):
         # Render logo art and text elements from Godot
         try:
             # CROPTOPIA DEMO art from main.tscn Sprite2D (world pos 343, 339)
+            # Sprite2D uses center anchor, so blit at center
             if self.decoration_sprite:
-                # Blit at topleft position to match reference rendering
-                deco_rect = self.decoration_sprite.get_rect(topleft=self.croptopia_pos)
+                deco_rect = self.decoration_sprite.get_rect(center=self.croptopia_pos)
                 surface.blit(self.decoration_sprite, deco_rect)
             
-            # "A game by DoubO" text - at bottom right, away from buttons
-            font_medium = pygame.font.Font(None, self.label_font_size)
-            label_surface = font_medium.render(self.label_text, True, (180, 160, 140))
+            # "A game by DoubO" text - exact position from main.tscn Label
+            # Label at world(506, 459) with size(139, 26), scale(3.203, 5.306)
+            # Render small then scale up (Godot style) - white text (Godot default)
+            label_small = self.label_font.render(self.label_text, True, (255, 255, 255))
+            scaled_width = int(label_small.get_width() * self.label_scale[0])
+            scaled_height = int(label_small.get_height() * self.label_scale[1])
+            label_surface = pygame.transform.scale(label_small, (scaled_width, scaled_height))
             label_rect = label_surface.get_rect(topleft=self.label_pos)
             surface.blit(label_surface, label_rect)
         except Exception as e:
@@ -310,7 +321,7 @@ class MainMenuScene(Scene):
                 if hasattr(pygame, 'mixer') and pygame.mixer.get_init():
                     pygame.mixer.music.stop()
                     self.music_playing = False
-                    print("[MainMenuScene] ♪ Music stopped")
+                    print("[MainMenuScene] [STOP] Music stopped")
             except Exception as e:
                 print(f"[MainMenuScene] Error stopping music: {e}")
 
