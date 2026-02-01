@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Any
 import pygame
+import math
 from PIL import Image
 import io
 
@@ -42,14 +43,43 @@ class GodotTSCNParser:
 
         # Extract tilemap offset
         self._extract_tilemap_offset(content)
+
+        # Compute tile bounds (tile coordinates)
+        tile_bounds = self._compute_tile_bounds()
         
         return {
             'textures': self.textures,
             'layers': self.tilemap_layers,
             'tileset_sources': self.tileset_sources,
             'tilemap_offset': self.tilemap_offset,
+            'tile_bounds': tile_bounds,
             'assets_path': str(self.assets_path)
         }
+
+    def _compute_tile_bounds(self) -> Tuple[int, int, int, int]:
+        """Compute min/max tile coordinates across all layers."""
+        min_x = None
+        max_x = None
+        min_y = None
+        max_y = None
+
+        for layer_data in self.tilemap_layers.values():
+            tiles = layer_data.get('tiles', [])
+            for tile in tiles:
+                x, y = tile[0], tile[1]
+                if min_x is None or x < min_x:
+                    min_x = x
+                if max_x is None or x > max_x:
+                    max_x = x
+                if min_y is None or y < min_y:
+                    min_y = y
+                if max_y is None or y > max_y:
+                    max_y = y
+
+        if min_x is None:
+            return (0, 0, 0, 0)
+
+        return (min_x, max_x, min_y, max_y)
 
     def _extract_tilemap_offset(self, content: str) -> None:
         """Extract TileMap world offset from node hierarchy"""
@@ -391,6 +421,9 @@ class SimpleTileMapRenderer:
         self.layer_tiles = []  # No longer used - we render by layer
         self.textures = textures
         self.map_surface = None
+
+        # Build spatial grid index once (used for fast viewport rendering)
+        self._build_grid_index()
         
         print(f"[Renderer] World bounds: X({min_x}->{max_x}) Y({min_y}->{max_y})")
         print(f"[Renderer] Map offset: {self.map_offset}")
@@ -412,12 +445,9 @@ class SimpleTileMapRenderer:
         cam_x = camera_offset[0]
         cam_y = camera_offset[1]
         
-        # Build spatial grid index for this frame (for efficient lookup)
-        self._build_grid_index()
-        
         # Render each layer in order
         for z_index, layer_idx, tiles, layer_name in self.layer_order:
-            self._render_layer(display, tiles, camera_offset, layer_name)
+            self._render_layer(display, tiles, camera_offset, layer_name, layer_idx)
     
     def _build_grid_index(self) -> None:
         """Build a spatial grid index of tiles by position for fast lookup"""
@@ -433,7 +463,7 @@ class SimpleTileMapRenderer:
                 
                 self.grid_index[grid_pos].append((layer_idx, tile))
     
-    def _render_layer(self, display: pygame.Surface, tiles: list, camera_offset: Tuple[float, float], layer_name: str) -> None:
+    def _render_layer(self, display: pygame.Surface, tiles: list, camera_offset: Tuple[float, float], layer_name: str, layer_idx: int) -> None:
         """Render a single layer of tiles by scanning the tilemap grid"""
         if not tiles or not self.textures:
             return
@@ -447,96 +477,117 @@ class SimpleTileMapRenderer:
         skipped = 0
         
         try:
-            for tile in tiles:
-                if len(tile) == 6:
-                    x, y, source_id, atlas_x, atlas_y, alt_id = tile
-                else:
-                    x, y, source_id, atlas_index, alt_id = tile
-                    atlas_x, atlas_y = 0, 0
-                
-                screen_x = int(x * self.TILE_SIZE + self.map_offset[0] - cam_x)
-                screen_y = int(y * self.TILE_SIZE + self.map_offset[1] - cam_y)
-                
-                # Cull tiles outside the viewport (with a small margin)
-                if screen_x < -self.TILE_SIZE or screen_y < -self.TILE_SIZE:
-                    culled += 1
-                    continue
-                if screen_x > view_w or screen_y > view_h:
-                    culled += 1
-                    continue
-                
-                source_def = self.source_defs.get(source_id)
-                if not source_def:
-                    skipped += 1
-                    continue
-                if len(tile) == 5:
-                    atlas_coords_list = source_def.get('atlas_coords_list', [])
-                    max_ax, max_ay = source_def.get('atlas_max', (-1, -1))
-                    
-                    if atlas_coords_list:
-                        # Source has manually-defined atlas coordinates
-                        # Wrap index using modulo to fit within available coords
-                        wrapped_idx = atlas_index % len(atlas_coords_list)
-                        atlas_x, atlas_y = atlas_coords_list[wrapped_idx]
-                    elif max_ax >= 0 and max_ay >= 0:
-                        # Regular grid source - use linear index
-                        cols = max_ax + 1
-                        atlas_x = atlas_index % cols
-                        atlas_y = atlas_index // cols
-                        
-                        # Bounds check: if calculated Y is out of range, skip this tile
-                        if atlas_y > max_ay:
+            # Compute visible tile bounds (in tile coords) for this frame
+            world_min_x = cam_x - self.map_offset[0]
+            world_min_y = cam_y - self.map_offset[1]
+            world_max_x = world_min_x + view_w
+            world_max_y = world_min_y + view_h
+
+            min_tx = math.floor(world_min_x / self.TILE_SIZE) - 1
+            min_ty = math.floor(world_min_y / self.TILE_SIZE) - 1
+            max_tx = math.ceil(world_max_x / self.TILE_SIZE) + 1
+            max_ty = math.ceil(world_max_y / self.TILE_SIZE) + 1
+
+            # Use grid index for fast lookup in the visible range
+            for ty in range(min_ty, max_ty + 1):
+                for tx in range(min_tx, max_tx + 1):
+                    grid_tiles = self.grid_index.get((tx, ty))
+                    if not grid_tiles:
+                        continue
+
+                    for grid_layer_idx, tile in grid_tiles:
+                        if grid_layer_idx != layer_idx:
+                            continue
+
+                        if len(tile) == 6:
+                            x, y, source_id, atlas_x, atlas_y, alt_id = tile
+                        else:
+                            x, y, source_id, atlas_index, alt_id = tile
+                            atlas_x, atlas_y = 0, 0
+
+                        screen_x = int(x * self.TILE_SIZE + self.map_offset[0] - cam_x)
+                        screen_y = int(y * self.TILE_SIZE + self.map_offset[1] - cam_y)
+
+                        # Cull tiles outside the viewport (with a small margin)
+                        if screen_x < -self.TILE_SIZE or screen_y < -self.TILE_SIZE:
+                            culled += 1
+                            continue
+                        if screen_x > view_w or screen_y > view_h:
+                            culled += 1
+                            continue
+
+                        source_def = self.source_defs.get(source_id)
+                        if not source_def:
                             skipped += 1
                             continue
-                    else:
-                        skipped += 1
-                        continue
-                texture_path = source_def.get('texture_path')
-                texture = self.texture_cache.get(texture_path)
-                if texture is None:
-                    skipped += 1
-                    continue
-                
-                region_size = source_def.get('region_size')
-                if region_size is None:
-                    # Calculate from texture size and atlas bounds
-                    max_ax, max_ay = source_def.get('atlas_max', (-1, -1))
-                    if max_ax >= 0 and max_ay >= 0:
+                        if len(tile) == 5:
+                            atlas_coords_list = source_def.get('atlas_coords_list', [])
+                            max_ax, max_ay = source_def.get('atlas_max', (-1, -1))
+                            
+                            if atlas_coords_list:
+                                # Source has manually-defined atlas coordinates
+                                # Wrap index using modulo to fit within available coords
+                                wrapped_idx = atlas_index % len(atlas_coords_list)
+                                atlas_x, atlas_y = atlas_coords_list[wrapped_idx]
+                            elif max_ax >= 0 and max_ay >= 0:
+                                # Regular grid source - use linear index
+                                cols = max_ax + 1
+                                atlas_x = atlas_index % cols
+                                atlas_y = atlas_index // cols
+                                
+                                # Bounds check: if calculated Y is out of range, skip this tile
+                                if atlas_y > max_ay:
+                                    skipped += 1
+                                    continue
+                            else:
+                                skipped += 1
+                                continue
+                        texture_path = source_def.get('texture_path')
+                        texture = self.texture_cache.get(texture_path)
+                        if texture is None:
+                            skipped += 1
+                            continue
+
+                        region_size = source_def.get('region_size')
+                        if region_size is None:
+                            # Calculate from texture size and atlas bounds
+                            max_ax, max_ay = source_def.get('atlas_max', (-1, -1))
+                            if max_ax >= 0 and max_ay >= 0:
+                                tex_w, tex_h = texture.get_size()
+                                # Subtract margins first
+                                margins_def = source_def.get('margins', (0, 0))
+                                usable_w = tex_w - margins_def[0]
+                                usable_h = tex_h - margins_def[1]
+                                region_w = usable_w // (max_ax + 1)
+                                region_h = usable_h // (max_ay + 1)
+                                region_size = (region_w, region_h)
+                            else:
+                                region_size = (self.TILE_SIZE, self.TILE_SIZE)
+                        
+                        margins = source_def.get('margins', (0, 0))
                         tex_w, tex_h = texture.get_size()
-                        # Subtract margins first
-                        margins_def = source_def.get('margins', (0, 0))
-                        usable_w = tex_w - margins_def[0]
-                        usable_h = tex_h - margins_def[1]
-                        region_w = usable_w // (max_ax + 1)
-                        region_h = usable_h // (max_ay + 1)
-                        region_size = (region_w, region_h)
-                    else:
-                        region_size = (self.TILE_SIZE, self.TILE_SIZE)
-                
-                margins = source_def.get('margins', (0, 0))
-                tex_w, tex_h = texture.get_size()
-                src_x = margins[0] + atlas_x * region_size[0]
-                src_y = margins[1] + atlas_y * region_size[1]
-                
-                try:
-                    tile_surf = texture.subsurface((src_x, src_y, region_size[0], region_size[1]))
-                except Exception as subsurface_error:
-                    skipped += 1
-                    continue
-                
-                # Apply alternative flags if present
-                flags = source_def.get('alt_flags', {}).get((atlas_x, atlas_y, alt_id))
-                if flags:
-                    if flags.get('transpose'):
-                        tile_surf = pygame.transform.rotate(tile_surf, -90)
-                    if flags.get('flip_h') or flags.get('flip_v'):
-                        tile_surf = pygame.transform.flip(tile_surf, flags.get('flip_h', False), flags.get('flip_v', False))
-                
-                if tile_surf.get_size() != (self.TILE_SIZE, self.TILE_SIZE):
-                    tile_surf = pygame.transform.scale(tile_surf, (self.TILE_SIZE, self.TILE_SIZE))
-                
-                display.blit(tile_surf, (screen_x, screen_y))
-                rendered += 1
+                        src_x = margins[0] + atlas_x * region_size[0]
+                        src_y = margins[1] + atlas_y * region_size[1]
+
+                        try:
+                            tile_surf = texture.subsurface((src_x, src_y, region_size[0], region_size[1]))
+                        except Exception as subsurface_error:
+                            skipped += 1
+                            continue
+                        
+                        # Apply alternative flags if present
+                        flags = source_def.get('alt_flags', {}).get((atlas_x, atlas_y, alt_id))
+                        if flags:
+                            if flags.get('transpose'):
+                                tile_surf = pygame.transform.rotate(tile_surf, -90)
+                            if flags.get('flip_h') or flags.get('flip_v'):
+                                tile_surf = pygame.transform.flip(tile_surf, flags.get('flip_h', False), flags.get('flip_v', False))
+                        
+                        if tile_surf.get_size() != (self.TILE_SIZE, self.TILE_SIZE):
+                            tile_surf = pygame.transform.scale(tile_surf, (self.TILE_SIZE, self.TILE_SIZE))
+                        
+                        display.blit(tile_surf, (screen_x, screen_y))
+                        rendered += 1
         except Exception as e:
             print(f"[Renderer] ERROR in {layer_name}: {e}")
             import traceback
