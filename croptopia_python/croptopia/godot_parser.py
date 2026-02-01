@@ -52,7 +52,7 @@ class GodotTSCNParser:
         }
 
     def _extract_tilemap_offset(self, content: str) -> None:
-        """Extract TileMap2 world offset from node hierarchy"""
+        """Extract TileMap world offset from node hierarchy"""
         def find_node_position(node_name: str) -> Tuple[float, float]:
             node_pattern = rf'\[node name="{re.escape(node_name)}"[^\n]*\](.*?)(?=\n\[node|\Z)'
             node_match = re.search(node_pattern, content, re.DOTALL)
@@ -64,14 +64,12 @@ class GodotTSCNParser:
                 return (0.0, 0.0)
             return (float(pos_match.group(1)), float(pos_match.group(2)))
 
-        spawn_node_pos = find_node_position('spawn_node')
-        spawn_pos = find_node_position('spawn')
-        tilemap_pos = find_node_position('TileMap2')
+        # Use JUST the TileMap2's local position as offset (more eastward)
+        tilemap_pos = find_node_position('TileMap')
+        if tilemap_pos == (0.0, 0.0):
+            tilemap_pos = find_node_position('TileMap2')
 
-        self.tilemap_offset = (
-            spawn_node_pos[0] + spawn_pos[0] + tilemap_pos[0],
-            spawn_node_pos[1] + spawn_pos[1] + tilemap_pos[1],
-        )
+        self.tilemap_offset = tilemap_pos
 
     def _extract_tileset_sources(self, content: str) -> None:
         """Extract TileSet atlas sources and map source IDs to textures"""
@@ -156,35 +154,48 @@ class GodotTSCNParser:
     def _extract_textures(self, content: str) -> None:
         """Extract texture resource declarations"""
         # Pattern for ExtResource declarations
-        pattern = r'\[ext_resource type="Texture2D".*?path="res://assets/([^"]+)".*?id="([^"]+)"\]'
-        
+        pattern = r'\[ext_resource type="Texture2D".*?path="res://([^"]+)".*?id="([^"]+)"\]'
+
+        # Resolve res:// paths from project root (parent of assets/ when available)
+        if self.assets_path.name.lower() == "assets":
+            project_root = self.assets_path.parent
+        else:
+            project_root = self.assets_path
+
         for match in re.finditer(pattern, content):
-            filename = match.group(1)
+            rel_path = match.group(1)
             resource_id = match.group(2)
-            asset_path = self.assets_path / filename
-            
-            if asset_path.exists():
-                self.textures[resource_id] = str(asset_path)
-            else:
-                self.textures[resource_id] = str(asset_path)  # Store path even if missing
-        
+            asset_path = project_root / rel_path
+
+            self.textures[resource_id] = str(asset_path)
+
         print(f"[Parser] Found {len(self.textures)} texture resources")
     
     def _extract_layer_data(self, content: str) -> None:
         """Extract TileMap layer data"""
-        # Find TileMap2 node
-        tilemap_pattern = r'\[node name="TileMap2".*?\n(.*?)\n\[node'
+        # Try to find TileMap node (could be "TileMap", "TileMap2", etc.)
+        tilemap_patterns = [
+            r'\[node name="TileMap".*?\n(.*?)\n\[node',  # First try "TileMap"
+            r'\[node name="TileMap2".*?\n(.*?)\n\[node',  # Then try "TileMap2"
+            r'\[node name="[^"]*TileMap[^"]*".*?\n(.*?)\n\[node'  # Finally try any node with "TileMap"
+        ]
         
-        tilemap_match = re.search(tilemap_pattern, content, re.DOTALL)
-        if not tilemap_match:
-            print("[Parser] No TileMap2 found")
+        tilemap_content = None
+        for pattern in tilemap_patterns:
+            tilemap_match = re.search(pattern, content, re.DOTALL)
+            if tilemap_match:
+                tilemap_content = tilemap_match.group(1)
+                break
+        
+        if not tilemap_content:
+            print("[Parser] No TileMap found")
             return
-        
-        tilemap_content = tilemap_match.group(1)
         
         # Extract all layer definitions
         layer_pattern = r'layer_(\d+)/name = "([^"]+)"'
         tile_data_pattern = r'layer_(\d+)/tile_data = PackedInt32Array\(([^)]*)\)'
+        z_index_pattern = r'layer_(\d+)/z_index = (-?\d+)'
+        y_sort_pattern = r'layer_(\d+)/y_sort_enabled = (true|false)'
         
         # Find all layers
         for match in re.finditer(layer_pattern, tilemap_content):
@@ -197,10 +208,18 @@ class GodotTSCNParser:
             if tile_match:
                 tile_data_str = tile_match.group(1)
                 tiles = self._parse_packedint32array(tile_data_str)
-                
+
+                z_index_match = re.search(f'layer_{layer_idx}/z_index = (-?\\d+)', tilemap_content)
+                z_index = int(z_index_match.group(1)) if z_index_match else 0
+
+                y_sort_match = re.search(f'layer_{layer_idx}/y_sort_enabled = (true|false)', tilemap_content)
+                y_sort_enabled = (y_sort_match.group(1) == 'true') if y_sort_match else False
+
                 self.tilemap_layers[layer_idx] = {
                     'name': layer_name,
-                    'tiles': tiles
+                    'tiles': tiles,
+                    'z_index': z_index,
+                    'y_sort_enabled': y_sort_enabled,
                 }
                 
                 if tiles:
@@ -217,9 +236,11 @@ class GodotTSCNParser:
         except:
             return []
         
-        # Group into tiles: ACTUAL CORRECT FORMAT
-        # value2 = marker(0x5E) + unused + source_id + unused
-        # value3 = atlas_y + alt_id (needs investigation)
+        # Group into tiles (TileMap format 2):
+        # value2 low 16 bits  = source_id (uint16)
+        # value2 high 16 bits = atlas_coord_x (uint16)
+        # value3 low 16 bits  = atlas_coord_y (uint16)
+        # value3 high 16 bits = alternative_tile_id (uint16)
         tiles = []
         i = 0
         while i < len(numbers) - 2:
@@ -244,23 +265,15 @@ class GodotTSCNParser:
             if value2 < 0:
                 value2 = value2 + (1 << 32)
             
-            source_id = (value2 >> 16) & 0xFF  # Byte 2 contains source_id
-            
-            # Atlas coordinates come from value3
+            source_id = value2 & 0xFFFF
+            atlas_x = (value2 >> 16) & 0xFFFF
+
             if value3 < 0:
-                value3_unsigned = value3 + (1 << 32)
-            else:
-                value3_unsigned = value3
-            
-            # Try to extract atlas coordinates from value3
-            # Most likely: atlas_y = lower bits, alt_id = upper bits
-            atlas_y = value3_unsigned & 0xFF
-            alt_id = (value3_unsigned >> 16) & 0xFFFF
-            
-            # For atlas_x, we need to find it - it might be in value3 as well
-            # Try: atlas_x = (value3 >> 8) & 0xFF
-            atlas_x = (value3_unsigned >> 8) & 0xFF
-            
+                value3 = value3 + (1 << 32)
+
+            atlas_y = value3 & 0xFFFF
+            alt_id = (value3 >> 16) & 0xFFFF
+
             tiles.append((x, y, source_id, atlas_x, atlas_y, alt_id))
             i += 3
         
@@ -270,7 +283,7 @@ class GodotTSCNParser:
 class SimpleTileMapRenderer:
     """Simple tilemap renderer - renders all tiles correctly"""
     
-    TILE_SIZE = 32
+    TILE_SIZE = 16
     
     def __init__(self, tilemap_data: Dict, assets_path: str = None):
         self.tilemap_data = tilemap_data
@@ -281,6 +294,7 @@ class SimpleTileMapRenderer:
         self.textures = []
         self.source_defs = {}
         self.layer_tiles = []
+        self.layer_order = []  # New: store layer rendering order
         self.map_offset = tilemap_data.get('tilemap_offset', (0, 0))
         
         # Load textures
@@ -293,12 +307,16 @@ class SimpleTileMapRenderer:
         """Load all PNG textures from assets folder"""
         print("[Renderer] Loading textures...")
         
-        if not self.assets_path.exists():
-            return
-        
-        png_files = list(self.assets_path.glob("**/*.png"))
-        
-        for png_path in png_files:
+        texture_paths = set()
+
+        if self.assets_path.exists():
+            texture_paths.update(self.assets_path.glob("**/*.png"))
+
+        for tex_path in self.tilemap_data.get('textures', {}).values():
+            if tex_path:
+                texture_paths.add(Path(tex_path))
+
+        for png_path in sorted(texture_paths):
             try:
                 pil_img = Image.open(png_path)
                 if pil_img.mode != 'RGBA':
@@ -330,16 +348,28 @@ class SimpleTileMapRenderer:
             print("[Renderer] No textures loaded!")
             return
         
-        # Collect all tiles to find world bounds and preserve layer order
-        all_tiles = []
-        ordered_tiles = []
-        for layer_idx in sorted(layers.keys()):
+        # Store layers in render order (sorted by z-index) but keep them separate
+        # This preserves per-layer y_sort behavior
+        self.layer_order = []
+        layer_items = []
+        for layer_idx in layers.keys():
             layer_data = layers[layer_idx]
-            layer_name = layer_data.get('name', '').lower()
+            layer_items.append((
+                layer_data.get('z_index', 0),
+                layer_idx,
+                layer_data
+            ))
+
+        all_tiles = []
+        for z_index, layer_idx, layer_data in sorted(layer_items, key=lambda item: (item[0], item[1])):
             tiles = layer_data.get('tiles', [])
-            if layer_name == 'ysort':
+            
+            # Apply y_sort for layers that need it
+            if layer_data.get('y_sort_enabled', False):
                 tiles = sorted(tiles, key=lambda t: t[1])
-            ordered_tiles.extend(tiles)
+            
+            # Store this layer for render-time access
+            self.layer_order.append((z_index, layer_idx, tiles, layer_data.get('name', 'unnamed')))
             all_tiles.extend(tiles)
         
         if not all_tiles:
@@ -350,9 +380,6 @@ class SimpleTileMapRenderer:
         xs = [t[0] for t in all_tiles]
         ys = [t[1] for t in all_tiles]
         
-        # Use all tiles now that coordinates are decoded correctly
-        tiles_to_render = all_tiles
-        
         if xs and ys:
             min_x, max_x = min(xs), max(xs)
             min_y, max_y = min(ys), max(ys)
@@ -360,8 +387,8 @@ class SimpleTileMapRenderer:
             min_x, max_x = 0, 64
             min_y, max_y = 0, 48
         
-        self.tiles = tiles_to_render
-        self.layer_tiles = ordered_tiles
+        self.tiles = all_tiles
+        self.layer_tiles = []  # No longer used - we render by layer
         self.textures = textures
         self.map_surface = None
         
@@ -377,25 +404,56 @@ class SimpleTileMapRenderer:
         pass
     
     def render(self, display: pygame.Surface, camera_offset: Tuple[float, float]) -> None:
-        """Render tilemap to display"""
-        if not self.tiles or not self.textures:
+        """Render tilemap to display, layer by layer in proper z-order"""
+        if not self.textures:
             return
         
         view_w, view_h = display.get_size()
         cam_x = camera_offset[0]
         cam_y = camera_offset[1]
         
-        tiles_iter = self.layer_tiles if self.layer_tiles else self.tiles
+        # Build spatial grid index for this frame (for efficient lookup)
+        self._build_grid_index()
         
-        # Debug counters
+        # Render each layer in order
+        for z_index, layer_idx, tiles, layer_name in self.layer_order:
+            self._render_layer(display, tiles, camera_offset, layer_name)
+    
+    def _build_grid_index(self) -> None:
+        """Build a spatial grid index of tiles by position for fast lookup"""
+        self.grid_index = {}  # {(x, y): [(layer_idx, tile_data), ...]}
+        
+        for z_index, layer_idx, tiles, layer_name in self.layer_order:
+            for tile in tiles:
+                x, y = tile[0], tile[1]
+                grid_pos = (x, y)
+                
+                if grid_pos not in self.grid_index:
+                    self.grid_index[grid_pos] = []
+                
+                self.grid_index[grid_pos].append((layer_idx, tile))
+    
+    def _render_layer(self, display: pygame.Surface, tiles: list, camera_offset: Tuple[float, float], layer_name: str) -> None:
+        """Render a single layer of tiles by scanning the tilemap grid"""
+        if not tiles or not self.textures:
+            return
+        
+        view_w, view_h = display.get_size()
+        cam_x = camera_offset[0]
+        cam_y = camera_offset[1]
+        
         rendered = 0
         culled = 0
-        no_source = 0
-        no_texture = 0
-        subsurface_fail = 0
+        skipped = 0
         
         try:
-            for x, y, source_id, atlas_x, atlas_y, alt_id in tiles_iter:
+            for tile in tiles:
+                if len(tile) == 6:
+                    x, y, source_id, atlas_x, atlas_y, alt_id = tile
+                else:
+                    x, y, source_id, atlas_index, alt_id = tile
+                    atlas_x, atlas_y = 0, 0
+                
                 screen_x = int(x * self.TILE_SIZE + self.map_offset[0] - cam_x)
                 screen_y = int(y * self.TILE_SIZE + self.map_offset[1] - cam_y)
                 
@@ -409,16 +467,34 @@ class SimpleTileMapRenderer:
                 
                 source_def = self.source_defs.get(source_id)
                 if not source_def:
-                    no_source += 1
-                    if no_source <= 3:
-                        print(f"[Renderer] No source def for source_id={source_id}")
+                    skipped += 1
                     continue
+                if len(tile) == 5:
+                    atlas_coords_list = source_def.get('atlas_coords_list', [])
+                    max_ax, max_ay = source_def.get('atlas_max', (-1, -1))
+                    
+                    if atlas_coords_list:
+                        # Source has manually-defined atlas coordinates
+                        # Wrap index using modulo to fit within available coords
+                        wrapped_idx = atlas_index % len(atlas_coords_list)
+                        atlas_x, atlas_y = atlas_coords_list[wrapped_idx]
+                    elif max_ax >= 0 and max_ay >= 0:
+                        # Regular grid source - use linear index
+                        cols = max_ax + 1
+                        atlas_x = atlas_index % cols
+                        atlas_y = atlas_index // cols
+                        
+                        # Bounds check: if calculated Y is out of range, skip this tile
+                        if atlas_y > max_ay:
+                            skipped += 1
+                            continue
+                    else:
+                        skipped += 1
+                        continue
                 texture_path = source_def.get('texture_path')
                 texture = self.texture_cache.get(texture_path)
                 if texture is None:
-                    no_texture += 1
-                    if no_texture <= 3:
-                        print(f"[Renderer] Missing texture for source {source_id}: {texture_path}")
+                    skipped += 1
                     continue
                 
                 region_size = source_def.get('region_size')
@@ -445,8 +521,7 @@ class SimpleTileMapRenderer:
                 try:
                     tile_surf = texture.subsurface((src_x, src_y, region_size[0], region_size[1]))
                 except Exception as subsurface_error:
-                    subsurface_fail += 1
-                    # Suppress error messages - just skip the tile
+                    skipped += 1
                     continue
                 
                 # Apply alternative flags if present
@@ -463,6 +538,6 @@ class SimpleTileMapRenderer:
                 display.blit(tile_surf, (screen_x, screen_y))
                 rendered += 1
         except Exception as e:
-            print(f"[Renderer] ERROR: {e}")
+            print(f"[Renderer] ERROR in {layer_name}: {e}")
             import traceback
             traceback.print_exc()
