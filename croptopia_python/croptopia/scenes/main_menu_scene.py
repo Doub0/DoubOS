@@ -74,10 +74,12 @@ class MainMenuScene(Scene):
         
         # Text elements (positions derived from main.tscn, then rendered simply)
         self.label_text = "A game by DoubO"
-        self.label_pos = self._world_to_screen((506, 459))
         self.label_font_size = max(12, int(26 * 5.30584 * self.camera_zoom.y))
+        self.label_pos = (900, 580)  # Lower right area, away from buttons
         self.croptopia_text = "CROPTOPIA\nDEMO"
-        self.croptopia_pos = self._world_to_screen((343, 339))
+        # Demo sprite world pos (343, 339) -> screen via camera transform
+        demo_screen = self._world_to_screen((343, 339))
+        self.croptopia_pos = demo_screen  # Will be used as topleft for blitting
         self._menu_screenshot_saved = False
         self._menu_screenshot_path = os.path.abspath(
             os.path.join(self.engine.croptopia_root, "..", "screenshot_menu_surface.png")
@@ -141,7 +143,7 @@ class MainMenuScene(Scene):
                 max(1, int(deco_img.get_height() * scale_y)),
             )
             self.decoration_sprite = pygame.transform.scale(deco_img, target_size)
-            print(f"[MainMenuScene] ✓ Loaded decoration sprite")
+            print(f"[MainMenuScene] ✓ Loaded decoration sprite ({target_size[0]}x{target_size[1]})")
         
         # Load splash texture
         splash_path = os.path.join(self.engine.croptopia_root, "pixil-frame-0 - 2024-02-26T083114.993.png")
@@ -287,21 +289,13 @@ class MainMenuScene(Scene):
         
         # Render logo art and text elements from Godot
         try:
-            # CROPTOPIA DEMO art from main.tscn Sprite2D
+            # CROPTOPIA DEMO art from main.tscn Sprite2D (world pos 343, 339)
             if self.decoration_sprite:
-                deco_rect = self.decoration_sprite.get_rect(center=self.croptopia_pos)
+                # Blit at topleft position to match reference rendering
+                deco_rect = self.decoration_sprite.get_rect(topleft=self.croptopia_pos)
                 surface.blit(self.decoration_sprite, deco_rect)
-            else:
-                font_large = pygame.font.Font(None, 48)
-                croptopia_lines = self.croptopia_text.split('\n')
-                y_offset = self.croptopia_pos[1] - (len(croptopia_lines) * 24)
-                for i, line in enumerate(croptopia_lines):
-                    text_surface = font_large.render(line, True, (220, 180, 80))
-                    text_rect = text_surface.get_rect(center=(self.croptopia_pos[0], y_offset + i * 48))
-                    surface.blit(text_surface, text_rect)
             
-            # "A game by DoubO" text - positioned at world(506, 459) -> screen(871, 575)
-            # Keep the label in the lower-right area without moving the buttons up
+            # "A game by DoubO" text - at bottom right, away from buttons
             font_medium = pygame.font.Font(None, self.label_font_size)
             label_surface = font_medium.render(self.label_text, True, (180, 160, 140))
             label_rect = label_surface.get_rect(topleft=self.label_pos)
