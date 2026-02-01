@@ -28,8 +28,8 @@ class GameEngine:
     """
     
     # Display settings
-    DISPLAY_WIDTH = 800
-    DISPLAY_HEIGHT = 600
+    DISPLAY_WIDTH = 1152
+    DISPLAY_HEIGHT = 648
     FPS = 60
     
     def __init__(self):
@@ -91,6 +91,10 @@ class GameEngine:
         print("[Engine] TIER 1 systems initialized")
         print("[Engine] Starting main game loop...")
     
+    def quit(self):
+        """Quit the game (called from menu buttons)"""
+        self.running = False
+    
     def run(self) -> None:
         """
         Main game loop.
@@ -143,6 +147,11 @@ class GameEngine:
                 # Handle UI clicks
                 mouse_pos = pygame.mouse.get_pos()
                 self.ui.handle_mouse_click(mouse_pos)
+    
+    def quit(self):
+        """Quit the game"""
+        print("[Engine] Quit requested")
+        self.running = False
         
         # Continuous key input for movement
         keys = pygame.key.get_pressed()

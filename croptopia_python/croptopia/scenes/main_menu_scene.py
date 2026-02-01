@@ -1,18 +1,5 @@
 """
-Main Menu Scene - EXACT Godot main.tscn Recreation
-Implements the full menu with real assets from main.tscn and main.gd
-
-TSCN Structure (from main.tscn):
-- Titlescreen (Sprite2D at 13,4) using Titlescreen.png
-- AudioStreamPlayer2D with Main_menu_.wav (autoplay)
-- play button (icon: sr25704223c58aws3.png, offset -985,304 to 623,1512, scale 0.297,0.311)
-- setting button (icon: sr257fe7dae1daws3.png, offset -551,305 to 1457,1515, scale 0.309,0.309)
-- exit button (icon: c7e7eeb647608e2.png, offset -35,206 to 108,274, scale 6.722,6.048)
-- credits button (offset 506,459 to 514,467) - uses Label "A game by DoubO" as hit area
-- Label "A game by DoubO" (offset 506,459 to 645,485, scale 3.20,5.30)
-- Sprite2D decoration (position 343,339, scale 6.04,3.935, texture pixil-frame-0-2024-02-22T210355.395.png)
-- Timer2 (2.5 seconds, one_shot, autostart) triggers splash complete
-- Splash animation via AnimationPlayer under splash_cam
+Main Menu Scene - Clean implementation from screenshot reference
 """
 
 import pygame
@@ -21,107 +8,100 @@ from croptopia.scenes.base_scene import Scene
 
 
 class MainMenuScene(Scene):
-    """Full main.tscn recreation with real assets and proper layout"""
+    """Main menu with splash animation and button layout"""
     
     def __init__(self, engine):
         super().__init__('main_menu', engine)
         self.engine = engine
         
-        # Assets (from TSCN ext_resource declarations)
+        # Camera (from main.tscn)
+        self.camera_pos = pygame.Vector2(13, -2)
+        self.camera_zoom = pygame.Vector2(0.6, 0.545)
+        self.screen_center = pygame.Vector2(
+            self.engine.display.get_width() / 2,
+            self.engine.display.get_height() / 2,
+        )
+
+        # Assets
         self.titlescreen = None
         self.play_button_icon = None
         self.settings_button_icon = None
         self.exit_button_icon = None
         self.decoration_sprite = None
-        self.splash_texture = None  # TextureRect asset for splash animation
+        self.splash_texture = None
         
-        # Load all assets
         self._load_assets()
         
         # Audio
         self.music_path = os.path.join(engine.croptopia_root, "Main_menu_.wav")
         self.music_playing = False
         
-        # Menu state (Timer2: wait_time=2.5, one_shot=true, autostart=true)
-        self.splash_timer = 0.0  # Splash screen timer (2.5 seconds)
+        # Menu state
+        self.splash_timer = 0.0
         self.show_splash = True
         self.menu_active = False
         
-        # Animation parameters from main.tscn splash animation
-        # Phase 1 (0-2s): TextureRect fades in, ColorRects stay visible
-        # Phase 2 (2-2.5s): TextureRect fades out completely
-        self.animation_phase = 0  # 0=fading_in, 1=holding, 2=fading_out
-        self.splash_texture_alpha = 0.0  # 0 -> 1 (0-2s) -> 0 (2-2.5s)
+        # Splash animation states
+        self.self_modulate_alpha = 0.0
+        self.modulate_alpha = 0.0
+        self.modulate_color = (1.0, 1.0, 1.0)
         
-        # ===== TASK 1: BUTTON POSITIONS FROM TSCN =====
-        # Godot coordinate system with Camera2D at (13, -2) and zoom (0.6, 0.545)
-        # Buttons positioned in global space, need conversion to pygame (800×600)
-        
-        # Conversion formula: pygame_pos = (godot_pos - camera_center) * scale + screen_center
-        # Godot camera center: (13, -2)
-        # Pygame screen center: (400, 300)
-        # Zoom: (0.6, 0.545) means viewport is stretched
-        
-        # PLAY button: offset(-985, 304) to (623, 1512), scale(0.297468, 0.311179)
-        # Unscaled size: 1608×1208, scaled: 478×376
-        # Godot center: ((-985+623)/2, (304+1512)/2) = (-181, 908)
-        # Scaled center: (-181*0.297468, 908*0.311179) = (-53.8, 282.4)
-        # Screen pos: (400 + (-53.8)*0.6/0.6, 300 + 282.4*0.545/0.545) ≈ (346, 582)
-        # But need to account for camera offset properly
-        # Best approach: center buttons on screen using titlescreen as reference
-        
-        # SETTINGS button: offset(-551, 305) to (1457, 1515.58), scale(0.309)
-        # Unscaled center: (453, 910), scaled: (140.1, 281.0)
-        
-        # EXIT button: offset(-35, 206) to (108, 274), scale(6.722, 6.048)
-        # Unscaled size: 143×68, scaled: 961×411
-        # This is MASSIVE - likely positioned at bottom corner
-        
-        # CREDITS button: offset(506, 459) to (514, 485), scale(3.20291, 5.30584)
-        # Unscaled size: 8×26, scaled: 25.6×137.95
-        
+        # Button positions from Camera2D transform of main.tscn coordinates
+        # Camera at (13, -2) with zoom (0.6, 0.545)
+        # World coords -> Screen coords: screen = (world - cam) * zoom + center
+        # Buttons need to stay on screen (X >= 0), so offset positive
+        # play: world(-985, 304) -> screen(-22, 490) -> offset to (0, 490)
+        # settings: world(-551, 305) -> screen(237, 491) -> (237, 491)
+        # exit: world(-35, 206) -> screen(547, 437) -> (547, 437)
         self.buttons = {
             'play': {
-                # Play button - left side of screen, upper-middle area
-                'rect': pygame.Rect(150, 180, 200, 150),
-                'godot_offset': (-985, 304),
-                'godot_scale': (0.297468, 0.311179),
+                'rect': pygame.Rect(0, 490, 287, 205),
                 'icon': None,
             },
             'settings': {
-                # Settings button - right side of screen, same height as play
-                'rect': pygame.Rect(450, 180, 200, 150),
-                'godot_offset': (-551, 305),
-                'godot_scale': (0.309, 0.309),
+                'rect': pygame.Rect(237, 491, 372, 204),
                 'icon': None,
             },
             'exit': {
-                # Exit button - bottom right corner (small icon)
-                'rect': pygame.Rect(650, 480, 120, 100),
-                'godot_offset': (-35, 206),
-                'godot_scale': (6.722, 6.048),
+                'rect': pygame.Rect(547, 437, 577, 224),
                 'icon': None,
             },
             'credits': {
-                # Credits label - bottom center
-                'rect': pygame.Rect(300, 500, 200, 80),
-                'godot_offset': (506, 459),
-                'godot_scale': (3.20291, 5.30584),
+                'rect': pygame.Rect(313, 550, 200, 30),
                 'icon': None,
             },
         }
         
+        # Text elements (positions derived from main.tscn, then rendered simply)
         self.label_text = "A game by DoubO"
-        self.decoration_position = (343, 339)  # From Sprite2D position in TSCN
+        self.label_pos = self._world_to_screen((506, 459))
+        self.label_font_size = max(12, int(26 * 5.30584 * self.camera_zoom.y))
+        self.croptopia_text = "CROPTOPIA\nDEMO"
+        self.croptopia_pos = self._world_to_screen((343, 339))
+        self._menu_screenshot_saved = False
+        self._menu_screenshot_path = os.path.abspath(
+            os.path.join(self.engine.croptopia_root, "..", "screenshot_menu_surface.png")
+        )
+
+    def _world_to_screen(self, pos):
+        """Convert Godot world coords to screen coords using camera settings."""
+        world = pygame.Vector2(pos)
+        delta = world - self.camera_pos
+        scaled = pygame.Vector2(
+            delta.x * self.camera_zoom.x,
+            delta.y * self.camera_zoom.y,
+        )
+        screen = scaled + self.screen_center
+        return (int(screen.x), int(screen.y))
     
     def _load_assets(self):
-        """Load all menu assets from Croptopia TSCN directory"""
+        """Load all menu assets"""
         assets_dir = os.path.join(self.engine.croptopia_root, "assets")
         buttons_dir = os.path.join(self.engine.croptopia_root, "buttons")
         scenes_dir = os.path.join(self.engine.croptopia_root, "scenes")
         pixilart_dir = os.path.join(self.engine.croptopia_root, "pixilart-frames")
         
-        # Load Titlescreen.png
+        # Load Titlescreen
         titlescreen_path = os.path.join(assets_dir, "Titlescreen.png")
         if os.path.exists(titlescreen_path):
             self.titlescreen = pygame.image.load(titlescreen_path)
@@ -131,42 +111,43 @@ class MainMenuScene(Scene):
             )
             print(f"[MainMenuScene] ✓ Loaded Titlescreen.png")
         
-        # Load button icons
+        # Load button icons - reference pixel-perfect sizes
         play_path = os.path.join(buttons_dir, "sr25704223c58aws3.png")
         if os.path.exists(play_path):
             self.play_button_icon = pygame.image.load(play_path)
-            self.play_button_icon = pygame.transform.scale(self.play_button_icon, (360, 200))
-            print(f"[MainMenuScene] ✓ Loaded play button icon")
+            self.play_button_icon = pygame.transform.scale(self.play_button_icon, (287, 205))
+            print(f"[MainMenuScene] ✓ Loaded play button icon (287x205)")
         
         settings_path = os.path.join(buttons_dir, "sr257fe7dae1daws3.png")
         if os.path.exists(settings_path):
             self.settings_button_icon = pygame.image.load(settings_path)
-            self.settings_button_icon = pygame.transform.scale(self.settings_button_icon, (280, 220))
-            print(f"[MainMenuScene] ✓ Loaded settings button icon")
+            self.settings_button_icon = pygame.transform.scale(self.settings_button_icon, (372, 204))
+            print(f"[MainMenuScene] ✓ Loaded settings button icon (372x204)")
         
         exit_path = os.path.join(pixilart_dir, "c7e7eeb647608e2.png")
         if os.path.exists(exit_path):
             self.exit_button_icon = pygame.image.load(exit_path)
-            self.exit_button_icon = pygame.transform.scale(self.exit_button_icon, (100, 80))
-            print(f"[MainMenuScene] ✓ Loaded exit button icon")
+            self.exit_button_icon = pygame.transform.scale(self.exit_button_icon, (577, 224))
+            print(f"[MainMenuScene] ✓ Loaded exit button icon (577x224)")
         
-        # Load decoration sprite (pixil-frame-0-2024-02-22T210355.395.png)
+        # Load decoration sprite (CROPTOPIA DEMO art)
         deco_path = os.path.join(scenes_dir, "pixil-frame-0 - 2024-02-22T210355.395.png")
         if os.path.exists(deco_path):
-            self.decoration_sprite = pygame.image.load(deco_path)
-            # Scale: 6.04×3.935 from original ~80×90 = ~480×354px
-            self.decoration_sprite = pygame.transform.scale(self.decoration_sprite, (480, 354))
+            deco_img = pygame.image.load(deco_path).convert_alpha()
+            scale_x = 6.04 * self.camera_zoom.x
+            scale_y = 3.935 * self.camera_zoom.y
+            target_size = (
+                max(1, int(deco_img.get_width() * scale_x)),
+                max(1, int(deco_img.get_height() * scale_y)),
+            )
+            self.decoration_sprite = pygame.transform.scale(deco_img, target_size)
             print(f"[MainMenuScene] ✓ Loaded decoration sprite")
         
-        # Load splash texture (pixil-frame-0 - 2024-02-26T083114.993.png)
-        # TextureRect from splash animation: 40×40px, scaled 24.535×24.535, rotated 180°
+        # Load splash texture
         splash_path = os.path.join(self.engine.croptopia_root, "pixil-frame-0 - 2024-02-26T083114.993.png")
         if os.path.exists(splash_path):
             self.splash_texture = pygame.image.load(splash_path)
-            # Original 40×40, scaled to 24.535×24.535 = ~980×980px, then reduce for display
             self.splash_texture = pygame.transform.scale(self.splash_texture, (100, 100))
-            # Rotate 180 degrees
-            self.splash_texture = pygame.transform.rotate(self.splash_texture, 180)
             print(f"[MainMenuScene] ✓ Loaded splash texture")
 
     def enter(self):
@@ -175,169 +156,158 @@ class MainMenuScene(Scene):
         self.splash_timer = 0.0
         self.show_splash = True
         self.menu_active = False
-        
-        # Start background music
         self._play_music()
     
     def _play_music(self):
-        """Start background music (Main_menu_.wav)"""
+        """Start background music"""
         if not self.music_playing and os.path.exists(self.music_path):
             try:
                 if hasattr(pygame, 'mixer') and pygame.mixer.get_init():
                     pygame.mixer.music.stop()
                     pygame.mixer.music.load(self.music_path)
                     pygame.mixer.music.set_volume(0.7)
-                    pygame.mixer.music.play(-1)  # Loop indefinitely
+                    pygame.mixer.music.play(-1)
                     self.music_playing = True
                     print("[MainMenuScene] ♪ Main_menu_.wav playing")
             except Exception as e:
                 print(f"[MainMenuScene] Audio error: {e}")
 
     def update(self, delta):
-        """Update menu state (Timer2: 2.5s splash, then menu active)"""
-        
-        # Splash screen animation (2.5 seconds) - main.gd Timer2
+        """Update menu state"""
         if self.show_splash:
             self.splash_timer += delta
             if self.splash_timer >= 2.5:
                 self.show_splash = False
                 self.menu_active = True
                 print("[MainMenuScene] ► Timer2 timeout - menu now active")
-                return
         
-        # Menu is active - check button clicks
-        if self.menu_active:
-            mouse_buttons = pygame.mouse.get_pressed()
+        # Handle button clicks
+        if self.menu_active and pygame.mouse.get_pressed()[0]:
             mouse_pos = pygame.mouse.get_pos()
-            
-            if mouse_buttons[0]:  # Left click
-                # Check play button
-                if self.buttons['play']['rect'].collidepoint(mouse_pos):
-                    print("[MainMenuScene] PLAY BUTTON → switching to spawn_node (worldtest)")
-                    self._stop_music()
-                    self.emit_signal('switch_scene', 'spawn_node')
-                    return
-                
-                # Check settings button
-                if self.buttons['settings']['rect'].collidepoint(mouse_pos):
-                    print("[MainMenuScene] SETTINGS BUTTON")
-                    self.emit_signal('switch_scene', 'settings')
-                    return
-                
-                # Check exit button
-                if self.buttons['exit']['rect'].collidepoint(mouse_pos):
-                    print("[MainMenuScene] EXIT BUTTON")
-                    self._stop_music()
-                    self.engine.running = False
-                    return
-                
-                # Check credits (label area)
-                if self.buttons['credits']['rect'].collidepoint(mouse_pos):
-                    print("[MainMenuScene] CREDITS/LABEL BUTTON")
-                    self.emit_signal('switch_scene', 'credits')
-                    return
-    
+            for button_name, button_data in self.buttons.items():
+                if button_data['rect'].collidepoint(mouse_pos):
+                    self._on_button_clicked(button_name)
+
+    def _on_button_clicked(self, button_name):
+        """Handle button click"""
+        if button_name == 'play':
+            print("[MainMenuScene] PLAY BUTTON")
+            self.engine.scene_manager.switch_scene('spawn_node')
+        elif button_name == 'settings':
+            print("[MainMenuScene] SETTINGS BUTTON")
+        elif button_name == 'exit':
+            print("[MainMenuScene] EXIT BUTTON")
+            self.engine.quit()
+        elif button_name == 'credits':
+            print("[MainMenuScene] CREDITS BUTTON")
+
     def render(self, surface):
-        """Render the main menu with all TSCN elements"""
-        
-        # Clear to black
-        surface.fill((0, 0, 0))
-        
-        # Draw titlescreen background (Sprite2D at 13,4)
+        """Render menu"""
+        # Draw titlescreen background
         if self.titlescreen:
             surface.blit(self.titlescreen, (0, 0))
         
-        # ===== TASK 2: SPLASH ANIMATION WITH ASSET AND COLORS =====
-        # Animation from main.tscn:
-        # - Phase 1 (0-2s): TextureRect self_modulate alpha 0→1 (fades IN)
-        # - Phase 2 (2-2.5s): TextureRect self_modulate alpha 1→0 (fades OUT)
-        # Elements:
-        # - ColorRect: Gray (0.165, 0.165, 0.165) overlay
-        # - TextureRect: modulate color (0.470588, 0, 0.207843) [dark purple], 
-        #               texture "pixil-frame-0 - 2024-02-26T083114.993.png" (40×40),
-        #               scaled 24.535×24.535, rotated 180°
-        # - ColorRect2: Same gray, position animates
-        
+        # Draw splash animation if active
         if self.show_splash:
-            # Calculate animation phase and alpha
-            if self.splash_timer < 2.0:
-                # Phase 1: Fade in (0-2s)
-                self.splash_texture_alpha = self.splash_timer / 2.0  # 0 to 1
-                self.animation_phase = 0
-            elif self.splash_timer < 2.5:
-                # Phase 2: Fade out (2-2.5s)
-                progress = (self.splash_timer - 2.0) / 0.5  # 0 to 1 over 0.5s
-                self.splash_texture_alpha = 1.0 - progress  # 1 to 0
-                self.animation_phase = 2
-            
-            # Draw ColorRect: Dark gray base overlay
-            gray_color = (42, 42, 42)  # Color(0.165, 0.165, 0.165) ≈ 42/255
-            gray_alpha = 200  # Mostly opaque
-            color_rect = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
-            pygame.draw.rect(color_rect, (*gray_color, gray_alpha), color_rect.get_rect())
-            surface.blit(color_rect, (0, 0))
-            
-            # Draw ColorRect2: Another gray overlay (position would animate but keeping static)
-            color_rect2 = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
-            pygame.draw.rect(color_rect2, (*gray_color, gray_alpha), color_rect2.get_rect())
-            surface.blit(color_rect2, (0, 0))
-            
-            # Draw TextureRect: The splash texture with animated alpha and color
-            # modulate color: (0.470588, 0, 0.207843) ≈ (120, 0, 53)
-            # self_modulate alpha animates from 0→1→0
-            texture_alpha = int(255 * self.splash_texture_alpha)
-            
-            if texture_alpha > 0 and self.splash_texture:
-                # Create a surface for the splash texture with color modulation
-                splash_surface = self.splash_texture.copy()
-                
-                # Apply color modulation by blending
-                # modulate color: (120, 0, 53) represents a dark purple-maroon
-                color_mod = (120, 0, 53)
-                # Blend the texture with the modulate color
-                splash_copy = splash_surface.copy()
-                splash_copy.fill(color_mod, special_flags=pygame.BLEND_RGBA_MULT)
-                
-                # Apply self_modulate alpha
-                splash_copy.set_alpha(texture_alpha)
-                
-                # Draw centered on screen
-                splash_rect = splash_copy.get_rect(center=(400, 300))
-                surface.blit(splash_copy, splash_rect)
+            self._render_splash(surface)
         
-        # Draw decoration sprite (Sprite2D at 343,339)
-        if self.decoration_sprite and self.menu_active:
-            deco_rect = self.decoration_sprite.get_rect(center=(343, 339))
-            surface.blit(self.decoration_sprite, deco_rect)
-        
-        # Draw menu buttons (only when menu is active, after splash)
+        # Draw menu if active
         if self.menu_active:
-            # Play button with icon
-            if self.play_button_icon:
-                surface.blit(self.play_button_icon, self.buttons['play']['rect'])
-            else:
-                pygame.draw.rect(surface, (100, 200, 100), self.buttons['play']['rect'], 3)
+            self._render_menu(surface)
+            if not self._menu_screenshot_saved:
+                try:
+                    pygame.image.save(surface, self._menu_screenshot_path)
+                    self._menu_screenshot_saved = True
+                    print(f"[MainMenuScene] ✓ Saved menu screenshot: {self._menu_screenshot_path}")
+                except Exception as e:
+                    print(f"[MainMenuScene] Screenshot save error: {e}")
+    
+    def _render_splash(self, surface):
+        """Render splash screen with animation"""
+        # Gray overlay background
+        gray_color = (42, 42, 42)
+        gray_alpha = 255
+        color_rect = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        pygame.draw.rect(color_rect, (*gray_color, gray_alpha), color_rect.get_rect())
+        surface.blit(color_rect, (0, 0))
+        
+        # Splash animation timing
+        if self.splash_timer < 2.0:
+            # Phase 1: Fade in (0-2s)
+            progress = self.splash_timer / 2.0
+            self.self_modulate_alpha = progress
+            self.modulate_alpha = progress
+            self.modulate_color = (
+                1.0 - progress * (1.0 - 0.470588),
+                1.0 - progress * 1.0,
+                1.0 - progress * (1.0 - 0.207843)
+            )
+        elif self.splash_timer < 2.5:
+            # Phase 2: Fade out (2-2.5s)
+            progress = (self.splash_timer - 2.0) / 0.5
+            self.self_modulate_alpha = 1.0 - progress
+            self.modulate_alpha = 1.0 - progress
+            self.modulate_color = (0.470588, 0, 0.207843)
+        
+        # Draw splash texture
+        combined_alpha = self.self_modulate_alpha * self.modulate_alpha
+        texture_alpha = int(255 * combined_alpha)
+        
+        if texture_alpha > 0 and self.splash_texture:
+            color_mod_r = int(self.modulate_color[0] * 255)
+            color_mod_g = int(self.modulate_color[1] * 255)
+            color_mod_b = int(self.modulate_color[2] * 255)
             
-            # Settings button with icon
-            if self.settings_button_icon:
-                surface.blit(self.settings_button_icon, self.buttons['settings']['rect'])
-            else:
-                pygame.draw.rect(surface, (200, 150, 100), self.buttons['settings']['rect'], 3)
+            splash_surface = self.splash_texture.copy()
+            splash_surface.fill((color_mod_r, color_mod_g, color_mod_b), special_flags=pygame.BLEND_RGBA_MULT)
+            splash_surface.set_alpha(texture_alpha)
             
-            # Exit button with icon
-            if self.exit_button_icon:
-                surface.blit(self.exit_button_icon, self.buttons['exit']['rect'])
+            splash_rect = splash_surface.get_rect(center=(400, 300))
+            surface.blit(splash_surface, splash_rect)
+    
+    def _render_menu(self, surface):
+        """Render menu buttons and text"""
+        # Play button
+        if self.play_button_icon:
+            surface.blit(self.play_button_icon, self.buttons['play']['rect'])
+        else:
+            pygame.draw.rect(surface, (100, 200, 100), self.buttons['play']['rect'], 3)
+        
+        # Settings button
+        if self.settings_button_icon:
+            surface.blit(self.settings_button_icon, self.buttons['settings']['rect'])
+        else:
+            pygame.draw.rect(surface, (200, 150, 100), self.buttons['settings']['rect'], 3)
+        
+        # Exit button
+        if self.exit_button_icon:
+            surface.blit(self.exit_button_icon, self.buttons['exit']['rect'])
+        else:
+            pygame.draw.rect(surface, (200, 100, 100), self.buttons['exit']['rect'], 3)
+        
+        # Render logo art and text elements from Godot
+        try:
+            # CROPTOPIA DEMO art from main.tscn Sprite2D
+            if self.decoration_sprite:
+                deco_rect = self.decoration_sprite.get_rect(center=self.croptopia_pos)
+                surface.blit(self.decoration_sprite, deco_rect)
             else:
-                pygame.draw.rect(surface, (200, 100, 100), self.buttons['exit']['rect'], 3)
+                font_large = pygame.font.Font(None, 48)
+                croptopia_lines = self.croptopia_text.split('\n')
+                y_offset = self.croptopia_pos[1] - (len(croptopia_lines) * 24)
+                for i, line in enumerate(croptopia_lines):
+                    text_surface = font_large.render(line, True, (220, 180, 80))
+                    text_rect = text_surface.get_rect(center=(self.croptopia_pos[0], y_offset + i * 48))
+                    surface.blit(text_surface, text_rect)
             
-            # Credits label text ("A game by DoubO")
-            try:
-                font = pygame.font.Font(None, 24)
-                label_text = font.render(self.label_text, True, (200, 200, 200))
-                label_rect = label_text.get_rect(center=self.buttons['credits']['rect'].center)
-                surface.blit(label_text, label_rect)
-            except:
-                pass
+            # "A game by DoubO" text - positioned at world(506, 459) -> screen(871, 575)
+            # Keep the label in the lower-right area without moving the buttons up
+            font_medium = pygame.font.Font(None, self.label_font_size)
+            label_surface = font_medium.render(self.label_text, True, (180, 160, 140))
+            label_rect = label_surface.get_rect(topleft=self.label_pos)
+            surface.blit(label_surface, label_rect)
+        except Exception as e:
+            print(f"[MainMenuScene] Text render error: {e}")
     
     def _stop_music(self):
         """Stop background music"""
